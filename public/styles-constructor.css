@@ -1,0 +1,164 @@
+/* Общие стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header {
+    background-color: #fff;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 150px;
+    height: auto;
+}
+
+.menu ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.menu ul li a:hover {
+    color: #007bff;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+.actions a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.actions a:hover {
+    color: #007bff;
+}
+
+.header-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.action-icon {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.action-icon:hover {
+    color: #007bff;
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.cart-count {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+/* Конструктор одежды */
+.constructor-content {
+    padding: 40px 0;
+    text-align: center;
+}
+
+.preview-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#clothing-preview {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    height: 400px;
+    overflow: hidden;
+}
+
+#clothing-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#customization-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.settings-panel {
+    text-align: center;
+}
+
+.settings-panel label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.settings-panel select,
+.settings-panel input {
+    padding: 5px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.settings-panel button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.settings-panel button:hover {
+    background-color: #0056b3;
+}

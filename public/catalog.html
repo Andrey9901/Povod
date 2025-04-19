@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог - Povod</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="containerMenu">
+            <a href="/index.html">
+                <img src="logo.jpg" alt="Логотип" class="logo">
+            </a>
+            <nav class="menu">
+                <ul>
+                    <li><a href="/index.html">Главная</a></li>
+                    <li><a href="/catalog">Каталог</a></li>
+                    <li><a href="/constructor">Конструктор</a></li>
+                    <li><a href="/about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <!-- Иконка поиска -->
+                <form class="search-form" action="#" method="GET">
+                    <input type="text" id="search-input" placeholder="Поиск товаров..." />
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                <!-- Иконка авторизации -->
+                <a href="/login" class="action-icon"><i class="fas fa-user"></i></a>
+                <!-- Иконка корзины -->
+                <a href="#" class="action-icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>    
+    </header>
+
+    <!-- Основной контент -->
+    <section class="catalog-content">
+        <div class="container">
+            <h1>Каталог товаров</h1>
+            <p>Это povod создать свою идеальную одежду</p>
+            <div class="products">
+                <div class="product">
+                    <div class="product-image">
+                        <img src="tovar.jpg" alt="Товар 1">
+                        <button class="add-to-cart-button">Добавить в корзину</button>
+                    </div>
+                    <h3>Вышивка на свитшоте</h3>
+                    <p class="price">2500 ₽</p>
+                </div>
+                <div class="product">
+                    <div class="product-image">
+                        <img src="tovar2.jpg" alt="Товар 2">
+                        <button class="add-to-cart-button">Добавить в корзину</button>
+                    </div>
+                    <h3>Вышивка на худи</h3>
+                    <p class="price">2500 ₽</p>
+                </div>
+                <div class="product">
+                    <div class="product-image">
+                        <img src="tovar3.jpg" alt="Товар 3">
+                        <button class="add-to-cart-button">Добавить в корзину</button>
+                    </div>
+                    <h3>Вышивка на футболке</h3>
+                    <p class="price">2500 ₽</p>
+                </div>
+            </div>
+            <!-- Коллекция "Патронус" -->
+<div class="collection">
+    <h2>Коллекция "Патронус"</h2>
+    <p>Особая коллекция для ценителей уникального стиля</p>
+    <div class="products">
+        <div class="product">
+            <div class="product-image">
+                <img src="tovar4.jpg" alt="Товар 4">
+                <button class="add-to-cart-button">Добавить в корзину</button>
+            </div>
+            <h3>Худи "Patronus"</h3>
+            <p class="price">3500 ₽</p>
+        </div>
+        <div class="product">
+            <div class="product-image">
+                <img src="tovar5.jpg" alt="Товар 5">
+                <button class="add-to-cart-button">Добавить в корзину</button>
+            </div>
+            <h3>Худи "Light"</h3>
+            <p class="price">4500 ₽</p>
+        </div>
+        <div class="product">
+            <div class="product-image">
+                <img src="tovar6.jpg" alt="Товар 6">
+                <button class="add-to-cart-button">Добавить в корзину</button>
+            </div>
+            <h3>Парные худи "Magic"</h3>
+            <p class="price">7800 ₽</p>
+        </div>
+    </div>
+</div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Povod. Все права защищены.</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

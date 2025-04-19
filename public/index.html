@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Povod - Магазин одежды</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="containerMenu">
+            <a>
+                <img src="logo.jpg" alt="Логотип" class="logo">
+              </a>
+            <nav class="menu">
+                <ul>
+                    <li><a href="/catalog">Каталог</a></li>
+                    <li><a href="/constructor">Конструктор</a></li>
+                    <li><a href="/about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+            <!-- Иконка поиска -->
+                <a href="#" class="action-icon"><i class="fas fa-search"></i></a>
+        <!-- Иконка авторизации -->
+                <a href="/login" class="action-icon"><i class="fas fa-user"></i></a>
+        <!-- Иконка корзины -->
+                <!-- <a href="#" class="action-icon"><i class="fas fa-shopping-cart"></i></a> --> 
+                <a href="#" class="action-icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>    
+    </header>
+
+    <!-- Баннер -->
+    <section class="banner">
+        <div class="container">
+            <h1>POVOD</h1>
+            <p>Потому что стиль — это не просто одежда, это твоя история.</p>
+            <a href="/catalog" class="btn">КУПИТЬ СЕЙЧАС</a>
+        </div>
+    </section>
+
+    <!-- Основной контент 
+    <section class="main-content">
+        <div class="container">
+            <div class="left-column">
+                <h2>Povod</h2>
+                <p>We we colunms to eathe to imentile foy leggy.</p>
+                <a href="#" class="btn">SHOP NOW</a>
+            </div>
+            <div class="right-column">
+                <div class="image-container">
+                    <img src="https://via.placeholder.com/400x600" alt="Модель в одежде">
+                </div>
+                <div class="text-box">
+                    <h3>Sary Ayles</h3>
+                    <p>Early age you one cable list inessing, it to senialates t-your crupcies.</p>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Коллекция товаров -->
+    <section class="product-collection">
+        <div class="container">
+            <h2>Популярные товары</h2>
+            <p>Зачем ждать повода, если ты уже им стал?</p>
+            <div class="products">
+                <div class="product">
+                    <img src="tovar.jpg" alt="Товар 1">
+                </div>
+                <div class="product">
+                    <img src="tovar2.jpg" alt="Товар 2">
+                </div>
+                <div class="product">
+                    <img src="tovar3.jpg" alt="Товар 3">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Povod. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>

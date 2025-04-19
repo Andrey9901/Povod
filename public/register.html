@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Povod</title>
+    <link rel="stylesheet" href="/styles-login.css">
+</head>
+<body>
+    <div class="auth-container">
+        <img src="/logo.jpg" alt="Логотип Povod" class="auth-logo">
+        <h1>Регистрация</h1>
+        <form action="/register" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Введите email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                <small>Минимум 8 символов, включая буквы, цифры и символы.</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">Подтвердите пароль:</label>
+                <input type="password" id="confirm-password" name="confirmPassword" placeholder="Повторите пароль" required>
+            </div>
+            <button type="submit" class="auth-button">Зарегистрироваться</button>
+        </form>
+        <p class="auth-link">Уже есть аккаунт? <a href="/login">Войдите</a>.</p>
+    </div>
+
+    <!-- Добавляем JavaScript для валидации пароля -->
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Проверка длины пароля
+            if (password.length < 8) {
+                alert('Пароль должен содержать не менее 8 символов.');
+                event.preventDefault();
+                return;
+            }
+
+            // Проверка соответствия паролей
+            if (password !== confirmPassword) {
+                alert('Пароли не совпадают.');
+                event.preventDefault();
+                return;
+            }
+
+            // Проверка наличия букв, цифр и символов
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (!(hasUpperCase && hasLowerCase && hasNumber && hasSymbol)) {
+                alert('Пароль должен содержать хотя бы одну заглавную букву, строчную букву, цифру и специальный символ.');
+                event.preventDefault();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

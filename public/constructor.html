@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор одежды - Povod</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="containerMenu">
+            <a href="/index.html">
+                <img src="logo.jpg" alt="Логотип" class="logo">
+            </a>
+            <nav class="menu">
+                <ul>
+                    <li><a href="/index.html">Главная</a></li>
+                    <li><a href="/catalog">Каталог</a></li>
+                    <li><a href="/constructor">Конструктор</a></li>
+                    <li><a href="/about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <!-- Иконка поиска -->
+                <a href="#" class="action-icon"><i class="fas fa-search"></i></a>
+                <!-- Иконка авторизации -->
+                <a href="/login" class="action-icon"><i class="fas fa-user"></i></a>
+                <!-- Иконка корзины -->
+                <a href="#" class="action-icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>    
+    </header>
+
+    <!-- Основной контент -->
+    <section class="constructor-content">
+        <div class="container">
+            <h1>Конструктор одежды</h1>
+            <p>Создайте свою уникальную одежду с помощью нашего конструктора</p>
+
+            <!-- Предпросмотр одежды -->
+            <div class="preview-container">
+                <h2>Предпросмотр:</h2>
+                <div id="clothing-preview">
+                    <img src="base-tshirt.jpg" alt="Базовая футболка" id="clothing-image">
+                    <div id="customization-layer"></div>
+                </div>
+            </div>
+
+            <!-- Панель настроек -->
+            <div class="settings-panel">
+                <h2>Настройки:</h2>
+                <label for="color-select">Выберите цвет:</label>
+                <select id="color-select">
+                    <option value="white">Белый</option>
+                    <option value="black">Черный</option>
+                    <option value="red">Красный</option>
+                    <option value="blue">Синий</option>
+                </select>
+
+                <label for="text-input">Добавьте текст:</label>
+                <input type="text" id="text-input" placeholder="Введите текст">
+
+                <button id="apply-changes">Применить изменения</button>
+                <!-- Добавляем кнопку сохранения -->
+                <button id="save-design">Сохранить дизайн</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Povod. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Подключение JavaScript -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="constructor.js"></script>
+</body>
+</html>
