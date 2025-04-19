@@ -9,7 +9,7 @@
         "start:ci": "node server.js",
         "cy:run": "npx cypress run",
         "cy:open": "npx cypress open",
-        "test:ci": "start-server-and-test start:ci http://localhost:3001 cy:run"
+        "test:ci": "start-server-and-test start:ci http://localhost:3001 cy:run",
     "dependencies": {
         "bcryptjs": "^3.0.2",
         "dotenv": "^16.4.7",
