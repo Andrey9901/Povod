@@ -178,7 +178,14 @@ app.post('/api/create-order', upload.single('designImage'), async (req, res) => 
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
+app.get('/healthz', (req, res) => {
+    // Проверка состояния mongose
+    if (mongoose.connection.readyState === 1) { // 1 = connected
+        res.status(200).send('OK');
+    } else {
+        res.status(503).send('Service Unavailable'); // Или другой код ошибки
+    }
+});
 // Обработка 404
 app.use((req, res) => {
     console.log('404 Not Found:', req.url); // Логирование
