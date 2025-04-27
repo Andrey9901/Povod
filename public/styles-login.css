@@ -9,7 +9,6 @@ body {
     align-items: center;
     height: 100vh;
 }
-
 .auth-container {
     background-color: #fff;
     padding: 20px 40px;
@@ -19,25 +18,21 @@ body {
     max-width: 400px;
     text-align: center;
 }
-
 .auth-container h1 {
     margin-bottom: 20px;
     font-size: 24px;
     color: #333;
 }
-
 .form-group {
     margin-bottom: 15px;
     text-align: left;
 }
-
 .form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
 }
-
 .form-group input {
     width: 100%;
     padding: 10px;
@@ -45,7 +40,6 @@ body {
     border-radius: 4px;
     font-size: 16px;
 }
-
 .auth-button {
     width: 100%;
     padding: 10px;
@@ -55,51 +49,40 @@ body {
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
-
 .auth-button:hover {
     background-color: #0056b3;
 }
-
 .auth-link {
     margin-top: 15px;
     font-size: 14px;
     color: #666;
 }
-
 .auth-link a {
     color: #007bff;
     text-decoration: none;
 }
-
 .auth-link a:hover {
     text-decoration: underline;
 }
-
 @media (max-width: 600px) {
     .auth-container {
         padding: 20px;
     }
 }
-
-.auth-button {
-    transition: background-color 0.3s ease;
-}
-
 .auth-logo {
-    width: 150px; /* Ширина логотипа */
-    margin-bottom: 20px; /* Отступ снизу */
-    display: block; /* Убедитесь, что логотип является блочным элементом */
-    margin-left: auto; /* Центрирование по горизонтали */
-    margin-right: auto; /* Центрирование по горизонтали */
+    width: 150px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
-
 @media (max-width: 600px) {
     .auth-logo {
-        width: 100px; /* Уменьшите ширину логотипа на маленьких экранах */
+        width: 100px;
     }
 }
-
 .error-message {
     color: red;
     font-size: 14px;

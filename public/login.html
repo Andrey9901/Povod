@@ -8,8 +8,13 @@
 </head>
 <body>
     <div class="auth-container">
+        <!-- Логотип -->
         <img src="/logo.jpg" alt="Логотип Povod" class="auth-logo">
+
+        <!-- Заголовок -->
         <h1>Вход</h1>
+
+        <!-- Форма входа -->
         <form action="/login" method="POST" class="auth-form">
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
@@ -21,7 +26,53 @@
             </div>
             <button type="submit" class="auth-button">Войти</button>
         </form>
-        <p class="auth-link">Нет аккаунта? <a href="/register">Зарегистрируйтесь</a>.</p>
+
+        <!-- Ссылка на восстановление пароля -->
+        <p class="auth-link">
+            Забыли пароль? <a href="/forgot-password">Восстановить</a>.
+        </p>
+
+        <!-- Ссылка на регистрацию -->
+        <p class="auth-link">
+            Нет аккаунта? <a href="/register">Зарегистрируйтесь</a>.
+        </p>
     </div>
+
+    <!-- JavaScript для валидации формы -->
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const usernameField = document.getElementById('username');
+            const passwordField = document.getElementById('password');
+
+            // Очистка предыдущих ошибок
+            document.getElementById('username-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
+
+            let hasError = false;
+
+            // Проверка имени пользователя
+            if (!usernameField.value.trim()) {
+                document.getElementById('username-error').textContent = 'Введите имя пользователя.';
+                usernameField.setAttribute('aria-invalid', 'true');
+                hasError = true;
+            } else {
+                usernameField.setAttribute('aria-invalid', 'false');
+            }
+
+            // Проверка пароля
+            if (!passwordField.value.trim()) {
+                document.getElementById('password-error').textContent = 'Введите пароль.';
+                passwordField.setAttribute('aria-invalid', 'true');
+                hasError = true;
+            } else {
+                passwordField.setAttribute('aria-invalid', 'false');
+            }
+
+            // Если есть ошибки, предотвращаем отправку формы
+            if (hasError) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>

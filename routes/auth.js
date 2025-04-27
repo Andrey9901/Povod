@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-
-// Пример базы данных пользователей (в реальном проекте используйте MongoDB/MySQL)
-const users = [];
+const User = require('../models/User'); // Импортируем модель пользователя
 
 // Страница входа
 router.get('/login', (req, res) => {
@@ -21,15 +19,28 @@ router.get('/login', (req, res) => {
 });
 
 // Обработка входа
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = users.find(u => u.username === username);
 
-    if (user && bcrypt.compareSync(password, user.password)) {
-        req.session.user = user; // Сохраняем пользователя в сессии
+    try {
+        // Находим пользователя в базе данных
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.send('<p>Неверное имя пользователя или пароль. <a href="/auth/login">Попробовать снова</a>.</p>');
+        }
+
+        // Проверяем пароль
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.send('<p>Неверное имя пользователя или пароль. <a href="/auth/login">Попробовать снова</a>.</p>');
+        }
+
+        // Сохраняем пользователя в сессии
+        req.session.user = { username: user.username };
         res.redirect('/profile');
-    } else {
-        res.send('<p>Неверное имя пользователя или пароль. <a href="/auth/login">Попробовать снова</a>.</p>');
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).send('Ошибка при входе.');
     }
 });
 
@@ -40,6 +51,8 @@ router.get('/register', (req, res) => {
         <form action="/auth/register" method="POST">
             <label for="username">Имя пользователя:</label>
             <input type="text" id="username" name="username" required><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
             <label for="password">Пароль:</label>
             <input type="password" id="password" name="password" required><br>
             <button type="submit">Зарегистрироваться</button>
@@ -49,23 +62,37 @@ router.get('/register', (req, res) => {
 });
 
 // Обработка регистрации
-router.post('/register', (req, res) => {
-    const { username, password } = req.body;
+router.post('/register', async (req, res) => {
+    const { username, email, password } = req.body;
 
-    if (users.some(u => u.username === username)) {
-        return res.send('<p>Пользователь с таким именем уже существует. <a href="/auth/register">Попробовать снова</a>.</p>');
+    try {
+        // Проверяем, существует ли пользователь с таким именем или email
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            return res.send('<p>Пользователь с таким именем или email уже существует. <a href="/auth/register">Попробовать снова</a>.</p>');
+        }
+
+        // Хешируем пароль
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Создаем нового пользователя
+        const newUser = new User({ username, email, password: hashedPassword });
+        await newUser.save();
+
+        // Перенаправляем на страницу входа
+        res.redirect('/auth/login');
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).send('Ошибка при регистрации.');
     }
-
-    const hashedPassword = bcrypt.hashSync(password, 8);
-    users.push({ username, password: hashedPassword });
-    res.redirect('/auth/login');
 });
 
 // Выход из системы
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.send('Ошибка при выходе.');
+            console.error('Logout error:', err);
+            return res.status(500).send('Ошибка при выходе.');
         }
         res.redirect('/');
     });

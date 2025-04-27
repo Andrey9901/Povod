@@ -4,6 +4,7 @@ const customizationLayer = document.getElementById('customization-layer');
 const colorSelect = document.getElementById('color-select');
 const textInput = document.getElementById('text-input');
 const applyButton = document.getElementById('apply-changes');
+const saveDesignButton = document.getElementById('save-design');
 
 // Обработчик изменения цвета
 colorSelect.addEventListener('change', function () {
@@ -33,27 +34,33 @@ applyButton.addEventListener('click', function () {
 });
 
 // Функция сохранения дизайна
-function saveDesign() {
-    html2canvas(document.querySelector("#clothing-preview")).then(canvas => {
-        canvas.toBlob(function (blob) {
+async function saveDesign() {
+    try {
+        // Создаем изображение с помощью html2canvas
+        const canvas = await html2canvas(document.querySelector("#clothing-preview"));
+        canvas.toBlob(async function (blob) {
             const formData = new FormData();
             formData.append('designImage', blob, 'design.png');
             formData.append('color', colorSelect.value);
 
-            fetch('/api/create-order', {
+            // Отправляем данные на сервер
+            const response = await fetch('/api/create-order', {
                 method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Дизайн успешно сохранен!');
-                })
-                .catch(error => {
-                    console.error('Ошибка при сохранении:', error);
-                });
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении дизайна.');
+            }
+
+            const data = await response.json();
+            alert('Дизайн успешно сохранен!');
         });
-    });
+    } catch (error) {
+        console.error('Ошибка при сохранении:', error);
+        alert('Произошла ошибка при сохранении дизайна.');
+    }
 }
 
 // Добавляем обработчик для кнопки сохранения
-document.getElementById('save-design').addEventListener('click', saveDesign);
+saveDesignButton.addEventListener('click', saveDesign);

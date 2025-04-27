@@ -8,63 +8,111 @@
 </head>
 <body>
     <div class="auth-container">
+        <!-- Логотип -->
         <img src="/logo.jpg" alt="Логотип Povod" class="auth-logo">
+
+        <!-- Заголовок -->
         <h1>Регистрация</h1>
-        <form action="/register" method="POST" class="auth-form">
+
+        <!-- Форма регистрации -->
+        <form action="/register" method="POST" class="auth-form" novalidate>
+            <!-- Поле для имени пользователя -->
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
-                <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Введите имя пользователя" 
+                    required
+                    pattern=".{3,30}" 
+                    title="Имя пользователя должно содержать от 3 до 30 символов."
+                >
+                <small>От 3 до 30 символов.</small>
             </div>
+
+            <!-- Поле для email -->
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Введите email" required>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Введите email" 
+                    required
+                >
             </div>
+
+            <!-- Поле для пароля -->
             <div class="form-group">
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Введите пароль" 
+                    required
+                    minlength="8"
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                    title="Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы."
+                >
                 <small>Минимум 8 символов, включая буквы, цифры и символы.</small>
             </div>
+
+            <!-- Поле для подтверждения пароля -->
             <div class="form-group">
                 <label for="confirm-password">Подтвердите пароль:</label>
-                <input type="password" id="confirm-password" name="confirmPassword" placeholder="Повторите пароль" required>
+                <input 
+                    type="password" 
+                    id="confirm-password" 
+                    name="confirmPassword" 
+                    placeholder="Повторите пароль" 
+                    required
+                >
             </div>
+
+            <!-- Кнопка регистрации -->
             <button type="submit" class="auth-button">Зарегистрироваться</button>
         </form>
-        <p class="auth-link">Уже есть аккаунт? <a href="/login">Войдите</a>.</p>
+
+        <!-- Ссылка на страницу входа -->
+        <p class="auth-link">
+            Уже есть аккаунт? <a href="/login">Войдите</a>.
+        </p>
     </div>
 
-    <!-- Добавляем JavaScript для валидации пароля -->
+    <!-- JavaScript для валидации формы -->
     <script>
         document.querySelector('form').addEventListener('submit', function(event) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
 
-            // Проверка длины пароля
-            if (password.length < 8) {
-                alert('Пароль должен содержать не менее 8 символов.');
-                event.preventDefault();
-                return;
-            }
+    // Проверка длины пароля
+    if (password.length < 8) {
+        alert('Пароль должен содержать не менее 8 символов.');
+        event.preventDefault();
+        return;
+    }
 
-            // Проверка соответствия паролей
-            if (password !== confirmPassword) {
-                alert('Пароли не совпадают.');
-                event.preventDefault();
-                return;
-            }
+    // Проверка соответствия паролей
+    if (password !== confirmPassword) {
+        alert('Пароли не совпадают.');
+        event.preventDefault();
+        return;
+    }
 
-            // Проверка наличия букв, цифр и символов
-            const hasUpperCase = /[A-Z]/.test(password);
-            const hasLowerCase = /[a-z]/.test(password);
-            const hasNumber = /\d/.test(password);
-            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    // Проверка наличия букв, цифр и символов
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-            if (!(hasUpperCase && hasLowerCase && hasNumber && hasSymbol)) {
-                alert('Пароль должен содержать хотя бы одну заглавную букву, строчную букву, цифру и специальный символ.');
-                event.preventDefault();
-                return;
-            }
-        });
+    if (!(hasUpperCase && hasLowerCase && hasNumber && hasSymbol)) {
+        alert('Пароль должен содержать хотя бы одну заглавную букву, строчную букву, цифру и специальный символ.');
+        event.preventDefault();
+        return;
+    }
+});
     </script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Povod</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="containerMenu">
+            <a href="/index.html">
+                <img src="logo.jpg" alt="Логотип" class="logo">
+            </a>
+            <nav class="menu">
+                <ul>
+                    <li><a href="/index.html">Главная</a></li>
+                    <li><a href="/catalog">Каталог</a></li>
+                    <li><a href="/constructor">Конструктор</a></li>
+                    <li><a href="/about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="#" class="action-icon"><i class="fas fa-search"></i></a>
+                <a href="/logout" class="action-icon"><i class="fas fa-user"></i> Выйти</a>
+                <a href="#" class="action-icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <section class="profile-content">
+        <div class="container">
+            <h1>Личный кабинет</h1>
+
+            <!-- Информация о пользователе -->
+            <div class="user-info">
+                <div class="avatar-section">
+                    <img id="user-avatar" src="default-avatar.jpg" alt="Аватар пользователя" class="avatar">
+                    <label for="avatar-upload" class="upload-button">
+                        <i class="fas fa-camera"></i> Загрузить фото
+                    </label>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                </div>
+                <div class="user-details">
+                    <p><strong>Имя:</strong> <span id="user-name">Имя пользователя</span></p>
+                    <p><strong>Email:</strong> <span id="user-email">email@example.com</span></p>
+                </div>
+            </div>
+
+            <!-- Разделы личного кабинета -->
+            <div class="profile-sections">
+                <div class="profile-section delivery-section">
+                    <h2>Доставки</h2>
+                    <p>Ближайшая доставка: не ожидается</p>
+                    <button class="btn">Пожаловаться на доставку</button>
+                </div>
+                <div class="profile-section discount-section">
+                    <h2>Скидка</h2>
+                    <p>Сумма выкупа: 14 742 ₽</p>
+                    <button class="btn">Подробнее</button>
+                </div>
+                <div class="profile-section orders-section">
+                    <h2>Покупки</h2>
+                    <p>Товаров: 0</p>
+                    <button class="btn">Подробнее</button>
+                </div>
+                <div class="profile-section wishlist-section">
+                    <h2>Отложенные товары</h2>
+                    <p>Товаров: 21</p>
+                    <button class="btn">Подробнее</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Povod. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Подключение JavaScript -->
+    <script src="profile.js"></script>
+</body>
+</html>

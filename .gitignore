@@ -4,7 +4,7 @@ node_modules/
 # Environment variables
 .env
 
-# Cypress artifacts (не всегда нужно игнорировать, но часто)
+# Cypress artifacts (РЅРµ РІСЃРµРіРґР° РЅСѓР¶РЅРѕ РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ, РЅРѕ С‡Р°СЃС‚Рѕ)
 cypress/videos/
 cypress/screenshots/
 

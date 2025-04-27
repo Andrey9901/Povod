@@ -9,6 +9,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
     color: #333;
+    line-height: 1.6;
 }
 
 .container {
@@ -18,6 +19,7 @@ body {
     padding: 0 20px;
 }
 
+/* Шапка */
 .header {
     background-color: #fff;
     padding: 10px 0;
@@ -45,21 +47,6 @@ body {
 }
 
 .menu ul li a:hover {
-    color: #007bff;
-}
-
-.actions {
-    display: flex;
-    gap: 15px;
-}
-
-.actions a {
-    text-decoration: none;
-    color: #333;
-    font-size: 1.2rem;
-}
-
-.actions a:hover {
     color: #007bff;
 }
 
@@ -113,6 +100,8 @@ body {
     width: 300px;
     height: 400px;
     overflow: hidden;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
 }
 
 #clothing-image {
@@ -132,20 +121,25 @@ body {
 
 .settings-panel {
     text-align: center;
+    margin-top: 20px;
 }
 
 .settings-panel label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
 }
 
 .settings-panel select,
 .settings-panel input {
-    padding: 5px;
+    padding: 10px;
     font-size: 1rem;
     margin-bottom: 10px;
     width: 100%;
     max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .settings-panel button {
@@ -161,4 +155,41 @@ body {
 
 .settings-panel button:hover {
     background-color: #0056b3;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .menu ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #clothing-preview {
+        width: 100%;
+        height: 300px;
+    }
+
+    .settings-panel select,
+    .settings-panel input {
+        max-width: 100%;
+    }
+}
+
+/* Сообщения об ошибках */
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+/* Успех */
+.success-message {
+    color: green;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
