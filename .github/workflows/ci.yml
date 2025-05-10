@@ -64,7 +64,7 @@ jobs:
           retention-days: 7
 
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1.6.0 # Или используйте конкретную версию
+        uses: allure-framework/setup-allurectl@v1 # Или используйте конкретную версию
 
       - name: Create Allure Environment Properties
         if: always()
