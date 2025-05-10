@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
     userId: {
@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema({
     },
 });
 
-// Создаем индекс для улучшения поиска
+// Создаем индекс для улучшения поиска 
 productSchema.index({ userId: 1, createdAt: -1 });
 
 const Product = mongoose.model('Product', productSchema);

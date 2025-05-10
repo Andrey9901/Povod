@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
 }, {
-    timestamps: true // Автоматически добавляет createdAt и updatedAt
+    timestamps: true // Автоматически добавляет createdAt и updatedAt 
 });
 
 module.exports = mongoose.model('User', userSchema);
