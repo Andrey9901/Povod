@@ -10,8 +10,14 @@ on:
       - main
 
 jobs:
-  test-and-report: # Объединим все в один job для простоты, можно разбить на этапы
+  test-and-report:
     runs-on: ubuntu-latest
+    # Предоставляем необходимые права для GITHUB_TOKEN, используемого в этом job'е
+    permissions:
+      contents: write # Необходимо для peaceiris/actions-gh-pages для пуша в ветку (например, gh-pages)
+      pages: write    # Необходимо для деплоя на GitHub Pages
+      id-token: write # Может понадобиться для некоторых advanced GitHub Pages setups
+
     services:
       mongodb:
         image: mongo:latest
@@ -25,7 +31,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Используйте 18.x LTS, 22 может быть слишком новой для некоторых пакетов
+          # Используем конкретную LTS версию Node.js для консистентности, 
+          # а не matrix, если не требуется тестирование на нескольких версиях Node.
+          node-version: '18.x' 
           cache: 'npm'
 
       - name: Install dependencies
@@ -35,93 +43,66 @@ jobs:
         run: npm run lint
 
       - name: Run Jest unit tests (generates Allure results)
-        run: npm run test:unit # Предполагается, что это запускает jest
-        # Jest с allure-репортером создаст файлы в allure-results/
+        run: npm run test:unit
 
-      # Запускаем Cypress тесты
-      # Они также будут генерировать результаты в allure-results/
       - name: Run Cypress tests (generates Allure results)
-        run: npm run test:ci # Ваш скрипт, который запускает сервер и потом cypress run
+        run: npm run test:ci 
         env:
-          MONGODB_URI: mongodb://localhost:27017/povod-test # Для сервера внутри CI
-          PORT: 3001                   # Для сервера внутри CI
-          # Для Cypress (если он запускается отдельной командой внутри test:ci)
-          CYPRESS_MONGODB_URI: mongodb://localhost:27017/povod_test # Если Cypress тесты используют свою БД
-          CYPRESS_BASE_URL: http://localhost:3001 # Передаем baseUrl явно
+          MONGODB_URI: mongodb://localhost:27017/povod_ci_test
+          PORT: 3001
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'a_very_strong_ci_secret_key_default' }} # Используйте GitHub Secrets для таких значений
+          # CYPRESS_BASE_URL: http://localhost:3001 # Обычно берется из cypress.config.js
 
-      # Сохраняем артефакты Cypress (видео/скриншоты) на случай падения
-      - name: Upload Cypress videos on failure
-        uses: actions/upload-artifact@v4
+      - name: Store Cypress artifacts on failure
         if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos
-          path: cypress/videos/
+          name: cypress-failures
+          path: |
+            cypress/screenshots
+            cypress/videos
           retention-days: 7
 
-      - name: Upload Cypress screenshots on failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots/
-          retention-days: 7
-      
-      # Установка Allure Commandline для генерации отчета
-      # Используем готовый GitHub Action для установки Allure
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1 # Более новый способ установки allurectl
-        # Или старый вариант:
-        # run: |
-        #   sudo wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz -O allure.tgz
-        #   sudo tar -zxvf allure.tgz -C /opt/
-        #   sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
-        #   allure --version
-      - name: Create Allure Environment Properties
-        run: |
-          echo "Browser=Chrome (via Cypress)" > allure-results/environment.properties
-          echo "Node.js=${{ matrix.node-version }}" >> allure-results/environment.properties
-          echo "OS=${{ runner.os }}" >> allure-results/environment.properties
-          echo "Base_URL=${{ env.CYPRESS_BASE_URL || 'http://localhost:3001' }}" >> allure-results/environment.properties
+        uses: allure-framework/setup-allurectl@v1.6.0 # Или используйте конкретную версию
 
-      # Генерируем Allure отчет из папки allure-results
-      - name: Install Allure Commandline via npm
-        run: npm install -g allure-commandline
+      - name: Create Allure Environment Properties
+        if: always()
+        run: |
+          echo "Application_Version=$(npm pkg get version | tr -d '\"')" > allure-results/environment.properties
+          echo "Base_URL=${{ env.CYPRESS_BASE_URL || 'http://localhost:3001' }}" >> allure-results/environment.properties
+          echo "Node.js_Version=$(node -v)" >> allure-results/environment.properties # Получаем фактическую версию Node, используемую runner'ом
+          echo "Operating_System=${{ runner.os }}" >> allure-results/environment.properties
+          echo "Branch=${{ github.ref_name }}" >> allure-results/environment.properties
+          echo "Commit_SHA=${{ github.sha }}" >> allure-results/environment.properties
+          echo "Run_ID=${{ github.run_id }}" >> allure-results/environment.properties
+          echo "Triggered_By=${{ github.actor }}" >> allure-results/environment.properties
 
       - name: Generate Allure report
         if: always()
-        run: allure generate allure-results --clean -o allure-report
-        # allure-results - папка с сырыми данными от Jest и Cypress
-        # allure-report - папка, куда будет сгенерирован HTML отчет\
-      - name: Upload Allure report to GitHub Pages
-        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') # Например, только для main/develop и если все тесты прошли
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report  # Папка с вашим HTML-отчетом Allure
-          # publish_branch: gh-pages     # Ветка, куда будет опубликован отчет (по умолчанию)
-          # keep_files: false            # Очищать ветку перед каждой публикацией (рекомендуется)
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: Deploy Allure report for ${{ github.sha }}
-          # cname: your-report-domain.com # Если у вас есть кастомный домен для GitHub Pages
+        # Используйте allurectl, если setup-allurectl его устанавливает, или allure, если устанавливаете allure-commandline
+        run: allurectl report generate --report-dir allure-report allure-results --clean 
+        # Альтернатива, если используете старый allure-commandline:
+        # run: allure generate allure-results --clean -o allure-report
 
-      # Публикуем Allure отчет как артефакт
-      - name: Upload Allure report
+
+      - name: Upload Allure report artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-report
-          path: allure-report # Путь к сгенерированному HTML отчету
+          name: allure-html-report
+          path: allure-report
           retention-days: 30
           
-      # Опционально: Деплой Allure отчета на GitHub Pages
-      # Этот шаг требует дополнительной настройки репозитория для GitHub Pages
-      # - name: Deploy Allure Report to GitHub Pages
-      #   if: always() && github.ref == 'refs/heads/main' # Например, только для main ветки
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./allure-report # Папка с HTML отчетом
-      #     # user_name: 'github-actions[bot]'
-      #     # user_email: 'github-actions[bot]@users.noreply.github.com'
-      #     # cname: your-custom-domain.com # Если есть кастомный домен для Pages
+      - name: Deploy Allure Report to GitHub Pages
+        # Запускаем только для пушей в main или develop и если все предыдущие шаги успешны
+        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Этот токен теперь будет иметь нужные права благодаря permissions
+          publish_dir: ./allure-report
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@github.com'
+          commit_message: 'Allure report' # Используйте английский или ваш язык для commit message
+          # publish_branch: gh-pages # Ветка, куда будет опубликован отчет (по умолчанию)
+          keep_files: true # Установите true, если хотите сохранять историю отчетов и видеть тренды в Allure
