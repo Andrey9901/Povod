@@ -2,6 +2,7 @@
 const { defineConfig } = require('cypress');
 const mongoose = require('mongoose');
 const Product = require('./models/Product'); // Убедитесь, что путь к вашей Mongoose модели Product правильный
+const allureWriter = require('@shelex/cypress-allure-plugin/writer');
 
 let mongooseConnection = null;
 
@@ -43,6 +44,7 @@ module.exports = defineConfig({
     e2e: {
         baseUrl: 'http://localhost:3001',
         setupNodeEvents(on, config) {
+            allureWriter(on, config);
             on('task', {
                 async dbConnect() {
                     await connectToTestDB();
@@ -101,8 +103,9 @@ module.exports = defineConfig({
             return config;
         },
         env: {
-            // allure: true, // Если используете Allure
-            // allureResultsPath: 'allure-results',
+            allure: true,
+            allureResultsPath: 'allure-results',
+            allureClearSkipped: true,
         }
     },
 });

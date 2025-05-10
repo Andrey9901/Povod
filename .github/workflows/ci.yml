@@ -76,6 +76,12 @@ jobs:
         #   sudo tar -zxvf allure.tgz -C /opt/
         #   sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
         #   allure --version
+      - name: Create Allure Environment Properties
+        run: |
+          echo "Browser=Chrome (via Cypress)" > allure-results/environment.properties
+          echo "Node.js=${{ matrix.node-version }}" >> allure-results/environment.properties
+          echo "OS=${{ runner.os }}" >> allure-results/environment.properties
+          echo "Base_URL=${{ env.CYPRESS_BASE_URL || 'http://localhost:3001' }}" >> allure-results/environment.properties
 
       # Генерируем Allure отчет из папки allure-results
       - name: Install Allure Commandline via npm

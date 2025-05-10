@@ -28,7 +28,7 @@ module.exports = [
             '**/*.png',
             '**/*.json',
             '.github/workflows/*.yml',
-            'allure - results/**',
+            'allure-results/**',
             'allure-report/**',
             'eslint.config.js', // Сам файл конфигурации тоже игнорируем от всех правил по умолчанию
         ],
