@@ -1,52 +1,106 @@
-name: Povod CI Tests
+﻿name: Povod CI Tests and Reports
 
-# ��������: ����� ��������� ���� workflow
 on:
   push:
     branches:
-      - main      # ��������� ��� ���� � ����� main
-      - develop   # ��������� ��� ���� � ����� develop
+      - main
+      - develop
   pull_request:
     branches:
-      - main      # ��������� ��� ��������/���������� Pull Request � ����� main
+      - main
 
-# ������ (jobs), ������� ����� �����������
 jobs:
-  cypress-run:
+  test-and-report: # Объединим все в один job для простоты, можно разбить на этапы
     runs-on: ubuntu-latest
     services:
       mongodb:
-
-        image: mongo:latest 
+        image: mongo:latest
         ports:
           - 27017:27017
 
     steps:
-      # ��� 1: ��������� ���� �� �����������
       - name: Checkout code
-        uses: actions/checkout@v4 # ���������� ������� Action
+        uses: actions/checkout@v4
 
-      # ��� 2: ��������� Node.js
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm' # �������� ����������� npm-������� ��� ���������
+          node-version: '18' # Используйте 18.x LTS, 22 может быть слишком новой для некоторых пакетов
+          cache: 'npm'
 
-      # ��� 3: ��������� ������������ �������
       - name: Install dependencies
         run: npm ci
 
-      # ��� 4: ������ ������ Cypress
-      - name: Run Cypress tests
-        run: npm run test:ci
+      - name: Run ESLint (SAST)
+        run: npm run lint
+
+      - name: Run Jest unit tests (generates Allure results)
+        run: npm run test:unit # Предполагается, что это запускает jest
+        # Jest с allure-репортером создаст файлы в allure-results/
+
+      # Запускаем Cypress тесты
+      # Они также будут генерировать результаты в allure-results/
+      - name: Run Cypress tests (generates Allure results)
+        run: npm run test:ci # Ваш скрипт, который запускает сервер и потом cypress run
         env:
-          MONGODB_URI: mongodb://localhost:27017/povod-test-db
-          PORT: 3001
-      - name: Upload Cypress artifacts
+          MONGODB_URI: mongodb://localhost:27017/povod-test # Для сервера внутри CI
+          PORT: 3001                   # Для сервера внутри CI
+          # Для Cypress (если он запускается отдельной командой внутри test:ci)
+          CYPRESS_MONGODB_URI: mongodb://localhost:27017/povod_test # Если Cypress тесты используют свою БД
+          CYPRESS_BASE_URL: http://localhost:3001 # Передаем baseUrl явно
+
+      # Сохраняем артефакты Cypress (видео/скриншоты) на случай падения
+      - name: Upload Cypress videos on failure
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cypress-artifacts
-          path: cypress/
+          name: cypress-videos
+          path: cypress/videos/
+          retention-days: 7
+
+      - name: Upload Cypress screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/
+          retention-days: 7
+      
+      # Установка Allure Commandline для генерации отчета
+      # Используем готовый GitHub Action для установки Allure
+      - name: Set up Allure Commandline
+        uses: allure-framework/setup-allurectl@v1 # Более новый способ установки allurectl
+        # Или старый вариант:
+        # run: |
+        #   sudo wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz -O allure.tgz
+        #   sudo tar -zxvf allure.tgz -C /opt/
+        #   sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+        #   allure --version
+
+      # Генерируем Allure отчет из папки allure-results
+      - name: Generate Allure report
+        if: always() # Генерировать отчет всегда, даже если тесты упали
+        run: allure generate allure-results --clean -o allure-report 
+        # allure-results - папка с сырыми данными от Jest и Cypress
+        # allure-report - папка, куда будет сгенерирован HTML отчет
+
+      # Публикуем Allure отчет как артефакт
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: allure-report # Путь к сгенерированному HTML отчету
           retention-days: 30
+          
+      # Опционально: Деплой Allure отчета на GitHub Pages
+      # Этот шаг требует дополнительной настройки репозитория для GitHub Pages
+      # - name: Deploy Allure Report to GitHub Pages
+      #   if: always() && github.ref == 'refs/heads/main' # Например, только для main ветки
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./allure-report # Папка с HTML отчетом
+      #     # user_name: 'github-actions[bot]'
+      #     # user_email: 'github-actions[bot]@users.noreply.github.com'
+      #     # cname: your-custom-domain.com # Если есть кастомный домен для Pages

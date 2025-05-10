@@ -18,3 +18,7 @@ logs
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Allure-results and reports
+allure-results/
+allure-report/

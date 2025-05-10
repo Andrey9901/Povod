@@ -1,15 +1,13 @@
-// Функция для фильтрации товаров
+// public/script.js
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
-    const cartIcon = document.querySelector('.cart-icon');
-    const cartCount = document.querySelector('.cart-count');
+    // const cartIcon = document.querySelector('.cart-icon'); // Переменная не использовалась
+    const cartCount = document.querySelector('.cart-count'); // Эта переменная используется
     const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Инициализация счетчика корзины
     updateCartCount();
 
-    // Слушаем ввод текста в поле поиска
     if (searchInput) {
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.trim().toLowerCase();
@@ -26,31 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Добавление товара в корзину
     addToCartButtons.forEach(button => {
         button.addEventListener('click', () => {
             const product = button.closest('.product');
             const productName = product.querySelector('h3').textContent;
             const productPrice = product.querySelector('.price').textContent;
-
-            // Проверяем, есть ли товар уже в корзине
             const existingItem = cartItems.find(item => item.name === productName);
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
                 cartItems.push({ name: productName, price: productPrice, quantity: 1 });
             }
-
-            // Обновляем localStorage
             localStorage.setItem('cart', JSON.stringify(cartItems));
             updateCartCount();
             alert(`${productName} добавлен в корзину!`);
         });
     });
 
-    // Обновление счетчика корзины
     function updateCartCount() {
-        const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-        cartCount.textContent = totalItems;
+        if (cartCount) { // Добавим проверку, что cartCount найден
+            const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
     }
 });

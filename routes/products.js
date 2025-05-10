@@ -1,73 +1,87 @@
+// routes/products.js
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product'); // Импортируем модель Product
-const multer = require('multer');
-const path = require('path');
+const mongoose = require('mongoose');
+//const { isLoggedIn, isAdmin } = require('../middleware/authMiddleware');
+const productService = require('../services/productService');
 
-// Настройка Multer для загрузки изображений
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './uploads/'); // Папка для сохранения загруженных файлов
-    },
-    filename: (req, file, cb) => {
-        // Генерация уникального имени файла
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage });
-
-// Получение всех заказов пользователя
-router.get('/:userId', async (req, res) => {
+// Получение всех продуктов (публичный эндпоинт)
+router.get('/', async (req, res) => {
     try {
-        const { userId } = req.params;
-        // Поиск всех заказов пользователя, отсортированных по дате создания
-        const products = await Product.find({ userId }).sort({ createdAt: -1 });
-        res.json(products); // Возвращаем заказы в формате JSON
+        const products = await productService.getAllProducts();
+        res.json(products);
     } catch (error) {
-        console.error('Error fetching user orders:', error);
-        res.status(500).json({ error: 'Ошибка сервера при получении заказов.' });
+        // console.error('Error in route /products fetching all products:', error.originalError || error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Ошибка при получении продуктов.';
+        res.status(statusCode).json({ message: message });
     }
 });
 
-// Создание нового заказа
-router.post('/', upload.single('designImage'), async (req, res) => {
-    try {
-        const { color, userId } = req.body;
-        const designImagePath = req.file ? req.file.filename : null; // Путь к изображению дизайна
-
-        // Создание нового заказа
-        const product = new Product({
-            userId,
-            color,
-            designImage: designImagePath,
-        });
-
-        await product.save(); // Сохранение заказа в базе данных
-        res.status(201).json(product); // Возвращаем созданный заказ в формате JSON
-    } catch (error) {
-        console.error('Error creating order:', error);
-        res.status(500).json({ error: 'Ошибка сервера при создании заказа.' });
+// Получение одного продукта по ID (публичный эндпоинт)
+router.get('/:id', async (req, res) => {
+    const productId = req.params.id;
+    console.log(`[SERVER LOG] Received request for product ID: ${productId}`);
+    // --- ДОБАВЛЕНА ПРОВЕРКА ФОРМАТА ID ---
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+        // Если ID не соответствует формату ObjectId, возвращаем 400 Bad Request
+        return res.status(400).json({ message: 'Некорректный формат ID продукта.' });
     }
-});
+    // --- КОНЕЦ ПРОВЕРКИ ---
 
-// Удаление заказа
-router.delete('/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Поиск и удаление заказа по ID
-        const product = await Product.findByIdAndDelete(id);
-
+        // Вызываем сервис только если формат ID корректный
+        const product = await productService.getProductById(productId);
         if (!product) {
-            return res.status(404).json({ error: 'Заказ не найден.' });
+            // Если ID был валиден, но продукт не найден в БД
+            console.log(`[SERVER LOG] Product NOT FOUND for ID: ${productId}`);
+            return res.status(404).json({ message: 'Продукт не найден.' });
         }
-
-        res.json({ message: 'Заказ успешно удален.' }); // Подтверждение удаления
+        console.log(`[SERVER LOG] Product FOUND for ID: ${productId}`, product);
+        // Продукт найден, отправляем его
+        res.json(product);
     } catch (error) {
-        console.error('Error deleting order:', error);
-        res.status(500).json({ error: 'Ошибка сервера при удалении заказа.' });
+        // Ловим только ошибки 500 из сервиса (ошибки БД) или другие непредвиденные
+        console.error(`Error in route /products/:id for ID ${productId}:`, error.originalError || error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Ошибка при получении продукта.';
+        res.status(statusCode).json({ message: message });
     }
 });
+
+// Создание нового продукта (защищенный эндпоинт)
+//router.post('/', isLoggedIn, isAdmin, async (req, res) => {
+router.post('/', async (req, res) => { // Вариант без middleware
+    const { color, designImage } = req.body;
+    const productInputData = { color, designImage };
+
+    // Получаем ID пользователя из сессии (убедитесь, что сессия и ID существуют)
+    const userId = req.session?.user?.id; // Используем optional chaining '?' на случай отсутствия сессии/user
+    if (!userId) {
+        // Эта проверка должна быть в middleware isLoggedIn, но дублируем на всякий случай
+        return res.status(401).json({ message: 'Требуется аутентификация для создания продукта.' });
+    }
+
+    try {
+        const newProduct = await productService.createProduct(productInputData, userId);
+        res.status(201).json(newProduct); // Отправляем созданный продукт
+    } catch (error) {
+        // console.error('Error creating product in route:', error.originalError || error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Непредвиденная ошибка при создании продукта.';
+        res.status(statusCode).json({ message: message, ...(error.details && { details: error.details }) });
+    }
+});
+
+// --- Маршруты для обновления и удаления (если они понадобятся) ---
+/*
+router.put('/:id', isLoggedIn, isAdmin, async (req, res) => {
+    // Логика обновления продукта (вызов productService.updateProduct)
+});
+
+router.delete('/:id', isLoggedIn, isAdmin, async (req, res) => {
+    // Логика удаления продукта (вызов productService.deleteProduct)
+});
+*/
 
 module.exports = router;

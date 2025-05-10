@@ -1,0 +1,90 @@
+/* Общие стили */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.auth-container {
+    background-color: #fff;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+.auth-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+.auth-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.auth-button:hover {
+    background-color: #0056b3;
+}
+.auth-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+}
+.auth-link a {
+    color: #007bff;
+    text-decoration: none;
+}
+.auth-link a:hover {
+    text-decoration: underline;
+}
+@media (max-width: 600px) {
+    .auth-container {
+        padding: 20px;
+    }
+}
+.auth-logo {
+    width: 150px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 600px) {
+    .auth-logo {
+        width: 100px;
+    }
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 15px;
+}

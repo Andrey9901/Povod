@@ -1,31 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет - Povod</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="/styles.css"> <!-- Убедитесь, что этот CSS существует -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Шапка -->
     <header class="header">
         <div class="containerMenu">
-            <a href="/index.html">
-                <img src="logo.jpg" alt="Логотип" class="logo">
+            <a href="/">
+                <!-- Ссылка на главную -->
+                <img src="/logo.jpg" alt="Логотип" class="logo">
             </a>
             <nav class="menu">
                 <ul>
-                    <li><a href="/index.html">Главная</a></li>
+                    <li><a href="/">Главная</a></li>
                     <li><a href="/catalog">Каталог</a></li>
                     <li><a href="/constructor">Конструктор</a></li>
                     <li><a href="/about">О нас</a></li>
                 </ul>
             </nav>
             <div class="header-actions">
-                <a href="#" class="action-icon"><i class="fas fa-search"></i></a>
-                <a href="/logout" class="action-icon"><i class="fas fa-user"></i> Выйти</a>
+                <a href="#" id="logout-link" class="action-icon"><i class="fas fa-user"></i> Выйти</a>
                 <a href="#" class="action-icon cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
@@ -39,18 +38,18 @@
         <div class="container">
             <h1>Личный кабинет</h1>
 
-            <!-- Информация о пользователе -->
+            <!-- Информация о пользователе (с заглушками) -->
             <div class="user-info">
                 <div class="avatar-section">
-                    <img id="user-avatar" src="default-avatar.jpg" alt="Аватар пользователя" class="avatar">
+                    <img id="user-avatar" src="/default-avatar.jpg" alt="Аватар пользователя" class="avatar">
                     <label for="avatar-upload" class="upload-button">
                         <i class="fas fa-camera"></i> Загрузить фото
                     </label>
                     <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
                 </div>
                 <div class="user-details">
-                    <p><strong>Имя:</strong> <span id="user-name">Имя пользователя</span></p>
-                    <p><strong>Email:</strong> <span id="user-email">email@example.com</span></p>
+                    <p><strong>Имя:</strong> <span id="user-name">Загрузка...</span></p>
+                    <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
                 </div>
             </div>
 
@@ -63,17 +62,17 @@
                 </div>
                 <div class="profile-section discount-section">
                     <h2>Скидка</h2>
-                    <p>Сумма выкупа: 14 742 ₽</p>
+                    <p>Сумма выкупа: (загрузка...)</p> <!-- Пример заглушки -->
                     <button class="btn">Подробнее</button>
                 </div>
                 <div class="profile-section orders-section">
-                    <h2>Покупки</h2>
-                    <p>Товаров: 0</p>
-                    <button class="btn">Подробнее</button>
+                    <h2>Мои созданные продукты</h2> <!-- Название изменено -->
+                    <div id="orders-list">Загрузка...</div> <!-- Для списка продуктов -->
+                    <p>Всего: <span id="orders-count">0</span></p> <!-- Счетчик продуктов -->
                 </div>
                 <div class="profile-section wishlist-section">
                     <h2>Отложенные товары</h2>
-                    <p>Товаров: 21</p>
+                    <p>Товаров: (загрузка...)</p> <!-- Пример заглушки -->
                     <button class="btn">Подробнее</button>
                 </div>
             </div>
@@ -83,11 +82,46 @@
     <!-- Подвал -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Povod. Все права защищены.</p>
+            <p>© 2025 Povod. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- Подключение JavaScript -->
-    <script src="profile.js"></script>
+    <!-- Подключение JavaScript для загрузки данных профиля -->
+    <script src="/profile.js"></script>
+    <script>
+        // Этот скрипт может быть в profile.js или прямо здесь, или в общем файле скриптов
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', async (event) => {
+                    event.preventDefault(); // Предотвращаем стандартный переход по ссылке (если бы href остался)
+                    console.log('Logout link clicked'); // Лог
+
+                    try {
+                        const response = await fetch('/auth/logout', { // Отправляем GET запрос
+                            method: 'GET', // GET по умолчанию, но лучше указать
+                            headers: { 'Accept': 'application/json' },
+                            credentials: 'include' // Важно для отправки сессионных кук
+                        });
+
+                        console.log('Logout API response status:', response.status);
+                        const result = await response.json();
+                        console.log('Logout API response result:', result);
+
+                        if (response.ok && result.success) {
+                            console.log('Logout successful, redirecting to /');
+                            window.location.href = '/'; // Редирект на главную
+                        } else {
+                            console.error('Logout API error:', result);
+                            alert(result.message || 'Ошибка при выходе.');
+                        }
+                    } catch (error) {
+                        console.error('Fetch error on logout:', error);
+                        alert('Ошибка сети при попытке выхода.');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

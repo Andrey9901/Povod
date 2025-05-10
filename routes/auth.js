@@ -1,100 +1,75 @@
+// project_new/routes/auth.js
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/User'); // Импортируем модель пользователя
+const { comparePasswords } = require('../utils/passwordUtils'); // Путь от 'routes/' к 'utils/'
+const userService = require('../services/userService');   // <--- ПРОВЕРЬТЕ ЭТОТ ПУТЬ! От 'routes/' к 'services/'
 
-// Страница входа
-router.get('/login', (req, res) => {
-    res.send(`
-        <h1>Вход</h1>
-        <form action="/auth/login" method="POST">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" required><br>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required><br>
-            <button type="submit">Войти</button>
-        </form>
-        <a href="/auth/register">Зарегистрироваться</a>
-    `);
-});
-
-// Обработка входа
+// POST /auth/login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
     try {
-        // Находим пользователя в базе данных
-        const user = await User.findOne({ username });
-        if (!user) {
-            return res.send('<p>Неверное имя пользователя или пароль. <a href="/auth/login">Попробовать снова</a>.</p>');
+        if (!username || !password) {
+            return res.status(400).json({ success: false, message: 'Имя пользователя и пароль обязательны.' });
+        }
+        const user = await userService.findUserByUsername(username);
+
+        /* eslint-disable security/detect-possible-timing-attacks */
+        if (!user || !(await comparePasswords(password, user.password))) {
+            return res.status(401).json({ success: false, message: 'Неверное имя пользователя или пароль.' });
         }
 
-        // Проверяем пароль
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.send('<p>Неверное имя пользователя или пароль. <a href="/auth/login">Попробовать снова</a>.</p>');
-        }
-
-        // Сохраняем пользователя в сессии
-        req.session.user = { username: user.username };
-        res.redirect('/profile');
+        req.session.user = { username: user.username, id: user._id };
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error on login:', err);
+                return res.status(500).json({ success: false, message: 'Ошибка сохранения сессии.' });
+            }
+            const userResponse = { _id: user._id, username: user.username, email: user.email };
+            return res.status(200).json({ success: true, message: 'Вход выполнен успешно.', user: userResponse });
+        });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).send('Ошибка при входе.');
+        console.error('Login error in route:', error.originalError || error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Ошибка сервера при попытке входа.';
+        return res.status(statusCode).json({ success: false, message: message });
     }
 });
 
-// Страница регистрации
-router.get('/register', (req, res) => {
-    res.send(`
-        <h1>Регистрация</h1>
-        <form action="/auth/register" method="POST">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" required><br>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required><br>
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-        <a href="/auth/login">Уже есть аккаунт? Войти</a>
-    `);
-});
-
-// Обработка регистрации
+// POST /auth/register
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
-
+    const { username, email, password, confirmPassword } = req.body;
     try {
-        // Проверяем, существует ли пользователь с таким именем или email
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            return res.send('<p>Пользователь с таким именем или email уже существует. <a href="/auth/register">Попробовать снова</a>.</p>');
+        if (!username || !email || !password || !confirmPassword) {
+            return res.status(400).json({ success: false, message: 'Все поля (username, email, password, confirmPassword) обязательны.' });
         }
-
-        // Хешируем пароль
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Создаем нового пользователя
-        const newUser = new User({ username, email, password: hashedPassword });
-        await newUser.save();
-
-        // Перенаправляем на страницу входа
-        res.redirect('/auth/login');
+        if (password !== confirmPassword) {
+            return res.status(400).json({ success: false, message: 'Пароли не совпадают.' });
+        }
+        const existingUser = await userService.findExistingUser(username, email);
+        if (existingUser) {
+            let field = existingUser.username === username ? 'Имя пользователя' : 'Email';
+            return res.status(409).json({ success: false, message: `${field} уже используется.` });
+        }
+        const newUser = await userService.createUser({ username, email, password });
+        const userResponse = { _id: newUser._id, username: newUser.username, email: newUser.email };
+        return res.status(201).json({ success: true, message: 'Регистрация прошла успешно.', user: userResponse });
     } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).send('Ошибка при регистрации.');
+        console.error('Registration error in route:', error.originalError || error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Ошибка сервера при регистрации.';
+        return res.status(statusCode).json({ success: false, message: message });
     }
 });
 
-// Выход из системы
+// GET /auth/logout
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
             console.error('Logout error:', err);
-            return res.status(500).send('Ошибка при выходе.');
+            return res.status(500).json({ success: false, message: 'Ошибка при выходе.' });
         }
-        res.redirect('/');
+        res.clearCookie('connect.sid');
+        res.status(200).json({ success: true, message: 'Выход выполнен успешно.' });
     });
 });
 

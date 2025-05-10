@@ -1,118 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация - Povod</title>
     <link rel="stylesheet" href="/styles-login.css">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.8em;
+            min-height: 1em;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
-        <!-- Логотип -->
         <img src="/logo.jpg" alt="Логотип Povod" class="auth-logo">
-
-        <!-- Заголовок -->
         <h1>Регистрация</h1>
 
-        <!-- Форма регистрации -->
-        <form action="/register" method="POST" class="auth-form" novalidate>
-            <!-- Поле для имени пользователя -->
+        <!-- Сообщение об ошибке от сервера -->
+        <div id="server-error" class="error-message" role="alert" aria-live="assertive"></div>
+
+        <!-- Убраны action/method, используется JS -->
+        <form class="auth-form" id="register-form" novalidate>
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    placeholder="Введите имя пользователя" 
-                    required
-                    pattern=".{3,30}" 
-                    title="Имя пользователя должно содержать от 3 до 30 символов."
-                >
+                <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required pattern=".{3,30}">
                 <small>От 3 до 30 символов.</small>
+                <small id="username-error" class="error-message"></small>
             </div>
-
-            <!-- Поле для email -->
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    placeholder="Введите email" 
-                    required
-                >
+                <input type="email" id="email" name="email" placeholder="Введите email" required>
+                <small id="email-error" class="error-message"></small>
             </div>
-
-            <!-- Поле для пароля -->
             <div class="form-group">
                 <label for="password">Пароль:</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    placeholder="Введите пароль" 
-                    required
-                    minlength="8"
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                    title="Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы."
-                >
+                <input type="password" id="password" name="password" placeholder="Введите пароль" required minlength="8" title="Минимум 8 символов...">
                 <small>Минимум 8 символов, включая буквы, цифры и символы.</small>
+                <small id="password-error" class="error-message"></small>
             </div>
-
-            <!-- Поле для подтверждения пароля -->
             <div class="form-group">
                 <label for="confirm-password">Подтвердите пароль:</label>
-                <input 
-                    type="password" 
-                    id="confirm-password" 
-                    name="confirmPassword" 
-                    placeholder="Повторите пароль" 
-                    required
-                >
+                <input type="password" id="confirm-password" name="confirmPassword" placeholder="Повторите пароль" required>
+                <small id="confirm-password-error" class="error-message"></small>
             </div>
-
-            <!-- Кнопка регистрации -->
             <button type="submit" class="auth-button">Зарегистрироваться</button>
         </form>
 
-        <!-- Ссылка на страницу входа -->
         <p class="auth-link">
-            Уже есть аккаунт? <a href="/login">Войдите</a>.
+            Уже есть аккаунт? <a href="/login">Войдите</a>. <!-- Ведет на GET /login -->
         </p>
     </div>
 
-    <!-- JavaScript для валидации формы -->
     <script>
-        document.querySelector('form').addEventListener('submit', function(event) {
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
+        const registerForm = document.getElementById('register-form');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        // Элементы ошибок
+        const usernameError = document.getElementById('username-error');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const confirmPasswordError = document.getElementById('confirm-password-error');
+        const serverError = document.getElementById('server-error');
 
-    // Проверка длины пароля
-    if (password.length < 8) {
-        alert('Пароль должен содержать не менее 8 символов.');
-        event.preventDefault();
-        return;
-    }
+        registerForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-    // Проверка соответствия паролей
-    if (password !== confirmPassword) {
-        alert('Пароли не совпадают.');
-        event.preventDefault();
-        return;
-    }
+            // Очистка ошибок
+            usernameError.textContent = ''; emailError.textContent = '';
+            passwordError.textContent = ''; confirmPasswordError.textContent = '';
+            serverError.textContent = '';
 
-    // Проверка наличия букв, цифр и символов
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const username = usernameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value; // Не тримим пароль
+            const confirmPassword = confirmPasswordInput.value;
+            let hasClientError = false;
 
-    if (!(hasUpperCase && hasLowerCase && hasNumber && hasSymbol)) {
-        alert('Пароль должен содержать хотя бы одну заглавную букву, строчную букву, цифру и специальный символ.');
-        event.preventDefault();
-        return;
-    }
-});
+            // --- Клиентская Валидация ---
+            if (username.length < 3 || username.length > 30) {
+                usernameError.textContent = 'Имя пользователя: 3-30 символов.'; hasClientError = true;
+            }
+            if (!email.includes('@') || !email.includes('.')) { // Простая проверка
+                emailError.textContent = 'Введите корректный email.'; hasClientError = true;
+            }
+            if (password.length < 8) {
+                passwordError.textContent = 'Пароль: минимум 8 символов.'; hasClientError = true;
+            }
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Пароли не совпадают.'; hasClientError = true;
+            }
+            // Можно добавить проверку сложности пароля на клиенте, но серверная надежнее
+            // --- Конец Клиентской Валидации ---
+
+            if (hasClientError) return;
+
+            // --- Отправка данных формы через Fetch ---
+            try {
+                serverError.textContent = 'Выполняется регистрация...';
+                const response = await fetch('/auth/register', { // Отправляем на API
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password, confirmPassword }),
+                    // credentials: 'include' // Не нужно для регистрации
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) { // Статус 201 и success: true
+                    alert('Регистрация прошла успешно! Теперь вы можете войти.');
+                    window.location.href = '/login'; // Перенаправляем на логин
+                } else {
+                    // Показываем ошибку от сервера
+                    serverError.textContent = result.message || `Ошибка ${response.status}`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                serverError.textContent = 'Ошибка сети или не удалось связаться с сервером.';
+            }
+        });
     </script>
 </body>
 </html>

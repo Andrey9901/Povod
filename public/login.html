@@ -1,76 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - Povod</title>
     <link rel="stylesheet" href="/styles-login.css">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.8em;
+            min-height: 1em;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
-        <!-- Логотип -->
         <img src="/logo.jpg" alt="Логотип Povod" class="auth-logo">
-
-        <!-- Заголовок -->
         <h1>Вход</h1>
 
-        <!-- Форма входа -->
-        <form action="/login" method="POST" class="auth-form">
+        <!-- Сообщение об ошибке от сервера -->
+        <div id="server-error" class="error-message" role="alert" aria-live="assertive"></div>
+
+        <form class="auth-form" id="login-form" novalidate>
+            <!-- Убран action и method -->
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
                 <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+                <small id="username-error" class="error-message"></small>
             </div>
             <div class="form-group">
                 <label for="password">Пароль:</label>
                 <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                <small id="password-error" class="error-message"></small>
             </div>
             <button type="submit" class="auth-button">Войти</button>
         </form>
 
-        <!-- Ссылка на восстановление пароля -->
         <p class="auth-link">
             Забыли пароль? <a href="/forgot-password">Восстановить</a>.
         </p>
-
-        <!-- Ссылка на регистрацию -->
         <p class="auth-link">
-            Нет аккаунта? <a href="/register">Зарегистрируйтесь</a>.
+            Нет аккаунта? <a href="/register">Зарегистрируйтесь</a>. <!-- Ведет на GET /register -->
         </p>
     </div>
 
-    <!-- JavaScript для валидации формы -->
     <script>
-        document.querySelector('form').addEventListener('submit', function(event) {
-            const usernameField = document.getElementById('username');
-            const passwordField = document.getElementById('password');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const usernameError = document.getElementById('username-error');
+        const passwordError = document.getElementById('password-error');
+        const serverError = document.getElementById('server-error');
 
-            // Очистка предыдущих ошибок
-            document.getElementById('username-error').textContent = '';
-            document.getElementById('password-error').textContent = '';
+        loginForm.addEventListener('submit', async function (event) {
+            event.preventDefault(); // Предотвращаем стандартную отправку
 
-            let hasError = false;
+            // Очистка ошибок
+            usernameError.textContent = '';
+            passwordError.textContent = '';
+            serverError.textContent = '';
 
-            // Проверка имени пользователя
-            if (!usernameField.value.trim()) {
-                document.getElementById('username-error').textContent = 'Введите имя пользователя.';
-                usernameField.setAttribute('aria-invalid', 'true');
-                hasError = true;
-            } else {
-                usernameField.setAttribute('aria-invalid', 'false');
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            let hasClientError = false;
+
+            // Простая клиентская валидация
+            if (!username) {
+                usernameError.textContent = 'Введите имя пользователя.';
+                hasClientError = true;
             }
-
-            // Проверка пароля
-            if (!passwordField.value.trim()) {
-                document.getElementById('password-error').textContent = 'Введите пароль.';
-                passwordField.setAttribute('aria-invalid', 'true');
-                hasError = true;
-            } else {
-                passwordField.setAttribute('aria-invalid', 'false');
+            if (!password) {
+                passwordError.textContent = 'Введите пароль.';
+                hasClientError = true;
             }
+            if (hasClientError) return;
 
-            // Если есть ошибки, предотвращаем отправку формы
-            if (hasError) {
-                event.preventDefault();
+            // Отправка данных через Fetch
+            try {
+                serverError.textContent = 'Выполняется вход...'; // Индикатор загрузки
+                const response = await fetch('/auth/login', { // Отправляем на API /auth/login
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include' // ВАЖНО для отправки кук сессии
+                });
+
+                const result = await response.json(); // Ожидаем JSON ответ
+
+                if (response.ok && result.success) {
+                    // Успешный вход - перенаправляем на профиль
+                    window.location.href = '/profile';
+                } else {
+                    // Показываем ошибку от сервера
+                    serverError.textContent = result.message || `Ошибка ${response.status}`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                serverError.textContent = 'Ошибка сети или не удалось связаться с сервером.';
             }
         });
     </script>

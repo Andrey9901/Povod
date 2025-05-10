@@ -1,0 +1,28 @@
+﻿{
+    "watch": [
+        "server.js",
+        "routes/",
+        "services/",
+        "models/",
+        "utils/",
+        ".env"
+    ],
+    "ext": "js,json,env",
+    "ignore": [
+        ".git",
+        "node_modules/**/node_modules",
+        "node_modules/",
+        "coverage/",
+        "cypress/",
+        "allure-results/",
+        "allure-report/",
+        "tests/",
+        "public/",
+        "eslint.config.js",
+        "jest.config.js",
+        "nodemon.json",
+        "*.log"
+    ],
+    "delay": "1500",
+    "verbose": true
+}

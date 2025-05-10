@@ -1,258 +1,164 @@
+// project_new/server.js
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const bcrypt = require('bcryptjs');
-const { body, validationResult } = require('express-validator');
 const app = express();
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
+// --- Импорт роутеров ---
+const authRoutes = require('./routes/auth'); // <--- ПРОВЕРЬТЕ ЭТОТ ПУТЬ! От корня проекта к routes/
+const productRoutes = require('./routes/products');
+
+// --- Базовые Middleware ---
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Добавляем CORS-заголовки
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
+// CORS
+app.use((_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    if (_req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        return res.status(200).json({});
+    }
     next();
 });
 
-// Статические файлы
+// --- Статические файлы ---
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/avatars', express.static(path.join(__dirname, 'avatars')));
 
-// Настройка сессий
+// --- Сессии (ДО роутов) ---
 app.use(session({
     secret: process.env.SESSION_SECRET || 'povod-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 часа
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
-// Подключение к MongoDB
-mongoose.connect('mongodb://localhost:27017/povod', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
-        process.exit(1); // Остановка сервера при ошибке подключения
-    });
+// --- Подключение к MongoDB ---
+const mongoURI = process.env.NODE_ENV === 'test'
+    ? process.env.TEST_MONGODB_URI || 'mongodb://localhost:27017/povod_test'
+    : process.env.MONGODB_URI || 'mongodb://localhost:27017/povod';
+console.log(`[SERVER] NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`[SERVER] Connecting to MongoDB at: ${mongoURI}`);
+mongoose.connect(mongoURI, {});
 
-// Модели
-const User = require('./models/User');
-const Product = require('./models/Product');
-
-// Настройка Multer для загрузки файлов
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
+// --- Multer ---
+const storage = multer.diskStorage({ destination: (_req, _file, cb) => cb(null, 'uploads/'), filename: (_req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)) });
 const upload = multer({ storage });
+const avatarStorage = multer.diskStorage({ destination: './avatars/', filename: (_req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)) });
+const uploadAvatar = multer({ storage: avatarStorage });
 
-// Middleware для проверки авторизации
+// --- Middleware ensureAuthenticated ---
 function ensureAuthenticated(req, res, next) {
-    if (req.session.user) {
+    if (req.session && req.session.user && req.session.user.id) {
         return next();
     }
-    console.log('Unauthorized access attempt to protected route'); // Логирование
-    res.redirect('/login'); // Перенаправление на страницу входа
+    console.log('Unauthorized access attempt to protected route:', req.originalUrl);
+    if (req.originalUrl.startsWith('/api/')) {
+        return res.status(401).json({ message: 'Требуется аутентификация' });
+    }
+    return res.redirect('/login');
 }
 
-// Маршруты для HTML-страниц
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/catalog', (req, res) => res.sendFile(path.join(__dirname, 'public', 'catalog.html')));
-app.get('/constructor', (req, res) => res.sendFile(path.join(__dirname, 'public', 'constructor.html')));
-app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
+// --- ОСНОВНЫЕ РОУТЕРЫ ---
+app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
 
-// Маршрут для страницы профиля (HTML)
-app.get('/profile', ensureAuthenticated, (req, res) => {
+// --- ОТДАЧА HTML СТРАНИЦ ---
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/register', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/catalog', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'catalog.html')));
+app.get('/constructor', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'constructor.html')));
+app.get('/about', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
+app.get('/profile', ensureAuthenticated, (req, res) => { // req используется в ensureAuthenticated
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
-// Маршрут для API профиля (JSON)
+// --- ДРУГИЕ API ЭНДПОИНТЫ ---
 app.get('/api/profile', ensureAuthenticated, async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.session.user.username });
-        if (!user) {
-            return res.status(404).send('Пользователь не найден.');
-        }
-        const orders = await Product.find({ userId: user.username }).sort({ createdAt: -1 });
+        const User = require('./models/User'); // Локальный require модели
+        const Product = require('./models/Product'); // Локальный require модели
+        const user = await User.findById(req.session.user.id).select('-password');
+        if (!user) { return res.status(404).json({ message: 'Пользователь не найден.' }); }
+        const userProducts = await Product.find({ userId: req.session.user.id }).sort({ createdAt: -1 });
         res.json({
-            user: {
-                username: user.username,
-                email: user.email,
-            },
-            orders: orders.map(order => ({
-                id: order._id,
-                color: order.color,
-                designImage: order.designImage,
-                createdAt: order.createdAt,
-            })),
+            user: { _id: user._id, username: user.username, email: user.email, avatar: user.avatar },
+            createdProducts: userProducts.map(p => ({ id: p._id, color: p.color, designImage: p.designImage, createdAt: p.createdAt })),
         });
     } catch (error) {
         console.error('Profile API error:', error);
-        res.status(500).send('Ошибка при загрузке данных профиля.');
+        res.status(500).json({ message: 'Ошибка при загрузке данных профиля.' });
     }
 });
 
-// Регистрация
-app.post('/register', [
-    body('username').notEmpty().withMessage('Имя пользователя обязательно.'),
-    body('email').isEmail().withMessage('Некорректный email.'),
-    body('password').isLength({ min: 6 }).withMessage('Пароль должен содержать минимум 6 символов.'),
-    body('confirmPassword').custom((value, { req }) => {
-        if (value !== req.body.password) {
-            throw new Error('Пароли не совпадают.');
-        }
-        return true;
-    })
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-    const { username, email, password } = req.body;
+app.post('/api/update-avatar', ensureAuthenticated, uploadAvatar.single('avatar'), async (req, res) => {
     try {
-        console.log('Attempting registration with username:', username); // Логирование попытки регистрации
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            console.error('User already exists:', username); // Логирование существующего пользователя
-            return res.status(409).send('Пользователь с таким именем или email уже существует.');
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword });
-        await newUser.save();
-        console.log('User registered successfully:', newUser.username); // Логирование успешной регистрации
-        res.status(201).redirect('/login');
-    } catch (error) {
-        console.error('Registration error:', error); // Логирование ошибок во время регистрации
-        res.status(500).send('Ошибка при регистрации.');
-    }
-});
-
-// Вход
-app.post('/login', [
-    body('username').notEmpty().withMessage('Имя пользователя обязательно.'),
-    body('password').notEmpty().withMessage('Пароль обязателен.')
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-    const { username, password } = req.body;
-    try {
-        console.log('Attempting login with username:', username); // Логирование попытки входа
-        const user = await User.findOne({ username });
-        if (!user) {
-            console.error('User not found:', username); // Логирование, если пользователь не найден
-            return res.status(401).send('Неверное имя пользователя или пароль.');
-        }
-        console.log('User found in database:', user.username); // Логирование найденного пользователя
-        console.log('Comparing passwords...'); // Логирование начала сравнения паролей
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            console.error('Password mismatch for user:', username); // Логирование несовпадения паролей
-            return res.status(401).send('Неверное имя пользователя или пароль.');
-        }
-        req.session.user = { username: user.username };
-        console.log('Login successful for user:', user.username); // Логирование успешного входа
-        res.redirect('/profile');
-    } catch (error) {
-        console.error('Login error:', error); // Логирование ошибок во время входа
-        res.status(500).send('Ошибка при входе.');
-    }
-});
-// Конфигурация Multer для загрузки аватаров
-const avatarStorage = multer.diskStorage({
-    destination: './avatars/',
-    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
-});
-const uploadAvatar = multer({ storage: avatarStorage });
-
-// API для обновления аватара
-app.post('/api/update-avatar', uploadAvatar.single('avatar'), async (req, res) => {
-    try {
-        const userId = req.session.user?.username || 'guest';
-        const user = await User.findOne({ username: userId });
-
-        if (!user) {
-            return res.status(404).send('Пользователь не найден.');
-        }
-
-        const avatarPath = req.file ? req.file.filename : null;
-        user.avatar = avatarPath;
+        const User = require('./models/User');
+        const user = await User.findById(req.session.user.id);
+        if (!user) { return res.status(404).json({ message: 'Пользователь не найден.' }); }
+        if (!req.file) { return res.status(400).json({ message: 'Файл аватара не был загружен.' }); }
+        user.avatar = req.file.filename;
         await user.save();
-
-        res.json({ avatar: `/avatars/${avatarPath}` });
+        res.json({ avatar: `/avatars/${user.avatar}` });
     } catch (error) {
         console.error('Avatar update error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Ошибка сервера при обновлении аватара' });
     }
 });
 
-// Выход из системы
-app.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            console.error('Logout error:', err);
-            return res.status(500).send('Ошибка при выходе.');
-        }
-        res.redirect('/');
+app.post('/api/create-product', ensureAuthenticated, upload.single('designImage'), async (req, res) => {
+    try {
+        const Product = require('./models/Product');
+        const { color } = req.body;
+        if (!color) { return res.status(400).json({ message: 'Цвет обязателен.' }); }
+        const designImagePath = req.file ? req.file.filename : null;
+        const product = new Product({ userId: req.session.user.id, color, designImage: designImagePath });
+        const savedProduct = await product.save();
+        res.status(201).json({ message: 'Продукт успешно создан', product: savedProduct });
+    } catch (error) {
+        console.error('Product creation API error:', error);
+        res.status(500).json({ message: 'Ошибка сервера при создании продукта' });
+    }
+});
+
+app.get('/healthz', (_req, res) => {
+    if (mongoose.connection.readyState === 1) { res.status(200).send('OK'); }
+    else { res.status(503).send('Service Unavailable'); }
+});
+
+// 404 handler
+app.use((_req, res, _next) => {
+    // Отправляем 404.html, если он у вас есть, или просто текст
+    const filePath404 = path.join(__dirname, 'public', '404.html');
+    if (require('fs').existsSync(filePath404)) {
+        res.status(404).sendFile(filePath404);
+    } else {
+        res.status(404).send('Извините, страница не найдена!');
+    }
+});
+
+// 500 error handler
+app.use((err, _req, res, _next) => {
+    console.error('Global error handler:', err.message);
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        message: err.message || 'Ошибка сервера.',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
 
-// Конструктор одежды
-app.post('/api/create-order', upload.single('designImage'), async (req, res) => {
-    try {
-        const { color } = req.body;
-        const designImagePath = req.file ? req.file.filename : null;
-        const product = new Product({
-            userId: req.session.user?.username || 'guest',
-            color,
-            designImage: designImagePath,
-        });
-        await product.save();
-        res.status(201).json({ message: 'Order created successfully', product });
-    } catch (error) {
-        console.error('Order creation error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-app.get('/healthz', (req, res) => {
-    // Проверка состояния mongose
-    if (mongoose.connection.readyState === 1) { // 1 = connected
-        res.status(200).send('OK');
-    } else {
-        res.status(503).send('Service Unavailable'); // Или другой код ошибки
-    }
-});
-// Обработка 404
-app.use((req, res) => {
-    console.log('404 Not Found:', req.url);
-    res.status(404).send('Страница не найдена');
-});
-
-// Глобальный обработчик ошибок
-app.use((err, req, res, next) => {
-    console.error('Global error handler:', err.stack);
-    res.status(500).send('Что-то пошло не так!');
-});
-
-// Запуск сервера
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Сервер запущен на http://localhost:${PORT}`));
