@@ -91,7 +91,19 @@ jobs:
         if: always()
         run: allure generate allure-results --clean -o allure-report
         # allure-results - папка с сырыми данными от Jest и Cypress
-        # allure-report - папка, куда будет сгенерирован HTML отчет
+        # allure-report - папка, куда будет сгенерирован HTML отчет\
+      - name: Upload Allure report to GitHub Pages
+        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') # Например, только для main/develop и если все тесты прошли
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report  # Папка с вашим HTML-отчетом Allure
+          # publish_branch: gh-pages     # Ветка, куда будет опубликован отчет (по умолчанию)
+          # keep_files: false            # Очищать ветку перед каждой публикацией (рекомендуется)
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: Deploy Allure report for ${{ github.sha }}
+          # cname: your-report-domain.com # Если у вас есть кастомный домен для GitHub Pages
 
       # Публикуем Allure отчет как артефакт
       - name: Upload Allure report
