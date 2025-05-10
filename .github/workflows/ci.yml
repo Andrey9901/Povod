@@ -64,7 +64,7 @@ jobs:
           retention-days: 7
 
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1 # Или используйте конкретную версию
+        run: npm install -g allure-commandline
 
       - name: Create Allure Environment Properties
         if: always()
@@ -81,7 +81,7 @@ jobs:
       - name: Generate Allure report
         if: always()
         # Используйте allurectl, если setup-allurectl его устанавливает, или allure, если устанавливаете allure-commandline
-        run: allurectl report generate --report-dir allure-report allure-results --clean 
+        run: allure generate allure-results --clean -o allure-report
         # Альтернатива, если используете старый allure-commandline:
         # run: allure generate allure-results --clean -o allure-report
 
