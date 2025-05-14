@@ -83,7 +83,7 @@ body {
 .action-icon {
     text-decoration: none;
     color: #333;
-    font-size: 1.5rem;
+    font-size: 1rem;
     transition: color 0.3s ease;
 }
 
@@ -282,10 +282,13 @@ body {
 
 /* Футер */
 .footer {
+    bottom: 0;
+    width: 100%;
     background-color: #333;
     color: white;
     text-align: center;
-    padding: 20px 0;
+    padding: 10px 0;
+    height: 50px; /* Фиксированная высота подвала */
 }
 
 .footer p {
@@ -546,7 +549,7 @@ body {
 #clothing-preview {
     position: relative;
     display: inline-block;
-    width: 300px;
+    width: 400px;
     height: 400px;
     overflow: hidden;
 }
@@ -587,7 +590,7 @@ body {
 .settings-panel button {
     padding: 10px 20px;
     font-size: 1rem;
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 5px;
@@ -599,6 +602,7 @@ body {
     background-color: #0056b3;
 }
 
+
 /* Личный кабинет */
 .profile-content {
     padding: 40px 0;
@@ -607,11 +611,15 @@ body {
 .user-info {
     display: flex;
     align-items: center;
+    flex-direction: column;
     gap: 20px;
 }
 
 .avatar-section {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .avatar {
@@ -623,8 +631,8 @@ body {
 
 .upload-button {
     display: inline-block;
-    background-color: #007bff;
-    color: white;
+    background-color: transparent;
+    color: rgb(0, 0, 0);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -642,9 +650,14 @@ body {
 
 .profile-sections {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr); /* Две колонки */
+    gap: 20px; /* Поля между ячейками */
     margin-top: 40px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .profile-section {
@@ -666,7 +679,7 @@ body {
 .btn {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 5px;
@@ -676,4 +689,43 @@ body {
 
 .btn:hover {
     background-color: #0056b3;
+}
+
+/* Стили для блока "Мои созданные продукты" */
+.profile-section.orders-section {
+    margin-top: 20px;
+}
+
+#orders-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#orders-list li {
+    display: flex;
+    align-items: center; /* Выравнивание по центру */
+    margin-bottom: 15px; /* Отступ между элементами */
+}
+
+#orders-list img {
+    max-width: 100px; /* Максимальная ширина изображения */
+    max-height: 100px; /* Максимальная высота изображения */
+    object-fit: cover; /* Сохранение пропорций без деформации */
+    border-radius: 8px; /* Округление углов для эстетики */
+    margin-right: 15px; /* Отступ между изображением и текстом */
+    flex-shrink: 0; /* Запрет уменьшения изображения */
+}
+
+#orders-list p {
+    margin: 0; /* Убираем лишние отступы у текста */
+    font-size: 14px; /* Размер шрифта */
+    color: #333; /* Цвет текста */
+}
+
+/* Стили для заглушки "Нет продуктов" */
+#orders-list p.empty-message {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
 }

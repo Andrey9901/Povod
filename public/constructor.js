@@ -5,9 +5,24 @@ const textInput = document.getElementById('text-input');
 const applyButton = document.getElementById('apply-changes');
 const saveDesignButton = document.getElementById('save-design');
 
+// Объект, содержащий пути к изображениям для каждого цвета
+const shirtImages = {
+    white: 'base-tshirt.jpg',  // Путь к белой футболке
+    black: 'black-tshirt.jpg',  // Путь к черной футболке
+    red: 'red-tshirt.jpg',      // Путь к красной футболке
+    blue: 'blue-tshirt.jpg',    // Путь к синей футболке
+    green: 'green-tshirt.png'   // Путь к зеленой футболке
+};
+
 // Обработчик изменения цвета
 colorSelect.addEventListener('change', function () {
-    clothingImage.style.backgroundColor = this.value;
+    const selectedColor = this.value; // Получаем выбранный цвет
+    if (shirtImages[selectedColor]) {
+        // Если для выбранного цвета есть изображение, обновляем src
+        clothingImage.src = shirtImages[selectedColor];
+    } else {
+        console.error('Изображение для выбранного цвета не найдено.');
+    }
 });
 
 // Обработчик применения изменений
