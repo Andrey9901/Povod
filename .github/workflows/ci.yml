@@ -1,4 +1,5 @@
-﻿name: Povod CI - Full Test Suite
+﻿# .github/workflows/ci.yml
+name: Povod CI - Full Test Suite
 
 on:
   push:
@@ -13,10 +14,10 @@ jobs:
   build_and_test: # Первый job: сборка, линтинг, функциональные тесты, Allure отчет
     runs-on: ubuntu-latest
     services:
-      mongodb:
-        image: mongo:latest
+      mongodb: # Сервис MongoDB для этого job'a
+        image: mongo:latest # Используем последнюю версию MongoDB
         ports:
-          - 27017:27017
+          - 27017:27017 # Пробрасываем порт для доступа с localhost
 
     steps:
       - name: Checkout code
@@ -25,88 +26,93 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '18.x' # Рекомендуется использовать LTS версию Node.js
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci # Используем 'ci' для более быстрой и надежной установки в CI
 
       - name: Run ESLint (SAST)
         run: npm run lint
 
       - name: Run Jest unit tests (generates Allure results)
-        run: npm run test:unit
+        run: npm run test:unit # Этот скрипт должен запускать Jest
 
       - name: Run Cypress E2E tests (API & UI - generates Allure results)
-        run: npm run test:ci
+        # Ваш скрипт test:ci уже содержит start-server-and-test
+        run: npm run test:ci 
         env:
-          MONGODB_URI: mongodb://localhost:27017/povod_test
-          PORT: 3001 
+          MONGODB_URI: mongodb://localhost:27017/povod_ci_functional_db # БД для функциональных тестов
+          PORT: 3001 # Порт для приложения во время Cypress тестов
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_functional_tests'
-          # CYPRESS_BASE_URL: http://localhost:3001 
+          # CYPRESS_BASE_URL: http://localhost:3001 # Обычно берется из cypress.config.js
 
       - name: Store Cypress artifacts on failure
-        if: failure()
+        if: failure() # Запускать только если предыдущие шаги упали
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-failures-${{ github.run_id }}
+          name: cypress-failures-${{ github.run_id }} # Уникальное имя артефакта
           path: |
             cypress/screenshots
             cypress/videos
           retention-days: 7
 
       - name: Set up Allure Commandline
-        run: npm install -g allure-commandline
+        uses: allure-framework/setup-allurectl@v1.6.0 # Используем конкретную версию для стабильности (или @v1 для последней мажорной)
 
       - name: Create Allure Environment Properties
         if: always()
         run: |
+          mkdir -p allure-results # Убедимся, что директория существует
           echo "Application_Version=$(npm pkg get version | tr -d '\"')" > allure-results/environment.properties
           echo "Base_URL=${{ env.CYPRESS_BASE_URL || 'http://localhost:3001' }}" >> allure-results/environment.properties
-          echo "Node.js_Version=$(node -v)" >> allure-results/environment.properties 
+          echo "Node.js_Version=$(node -v)" >> allure-results/environment.properties
           echo "Operating_System=${{ runner.os }}" >> allure-results/environment.properties
           echo "Branch=${{ github.ref_name }}" >> allure-results/environment.properties
           echo "Commit_SHA=${{ github.sha }}" >> allure-results/environment.properties
           echo "Run_ID=${{ github.run_id }}" >> allure-results/environment.properties
           echo "Triggered_By=${{ github.actor }}" >> allure-results/environment.properties
 
-      - name: Generate Allure report
-        if: always()
-        run: allure generate allure-results --clean -o allure-report
+      - name: Generate Allure report for functional tests
+        if: always() # Генерировать отчет всегда, чтобы видеть и прошедшие, и упавшие тесты
+        run: allurectl report generate --report-dir allure-report-functional allure-results # Используем allurectl
+        # Старая команда: allure generate allure-results --clean -o allure-report-functional
 
-      - name: Upload Allure report artifact
+      - name: Upload Allure report (Functional Tests)
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-html-report
-          path: allure-report
+          name: allure-report-functional-${{ github.run_id }} # Уникальное имя
+          path: allure-report-functional
           retention-days: 30
           
-      - name: Deploy Allure Report to GitHub Pages
-        if: success() && (github.ref == 'refs/heads/main')
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@github.com'
-          commit_message: 'Allure report'
-          keep_files: true
+      # Опционально: Деплой Allure отчета на GitHub Pages
+      # - name: Deploy Allure Report to GitHub Pages
+      #   if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./allure-report-functional # Публикуем отчет от функциональных тестов
+      #     user_name: 'github-actions[bot]'
+      #     user_email: 'github-actions[bot]@users.noreply.github.com' # Рекомендуемый email
+      #     commit_message: 'Deploy Allure report for functional tests ${{ github.sha }}'
+      #     force_orphan: true # Создает чистую ветку gh-pages каждый раз
 
   dast_zap_scan:
     runs-on: ubuntu-latest
-    needs: build_and_test 
+    name: ZAP Baseline Security Scan
+    needs: build_and_test # Запускать DAST только если предыдущий job (функциональные тесты) успешен
     
-    services: # Отдельный сервис MongoDB для DAST
-      mongodb_dast:
+    services:
+      mongodb_for_dast_app:
         image: mongo:latest
         ports:
-          - 27018:27017 # Используем другой хост-порт, чтобы не конфликтовать, если job'ы работают параллельно
+          - 27019:27017 # Используем другой хост-порт
 
-    name: ZAP Baseline Security Scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Node.js (for DAST target app)
         uses: actions/setup-node@v4
         with:
@@ -117,32 +123,59 @@ jobs:
         run: npm ci
 
       - name: Start application for ZAP Scan
+        # Убедитесь, что скрипт 'start:ci' в package.json это 'node server.js'
         run: npm run start:ci & # Запускаем в фоне
         env:
-          MONGODB_URI: mongodb://localhost:27018/povod_test
+          MONGODB_URI: mongodb://localhost:27019/povod_dast_scan_db
           PORT: 3002
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_dast'
-          NODE_ENV: 'dast'
+          NODE_ENV: 'dast' # Или 'test', если ваше приложение использует эту переменную для конфигурации БД
 
-      - name: Wait for application to start (simple wait)
+      - name: Wait for application to be ready on port 3002
         run: |
           echo "Waiting for application to start on port 3002..."
-          for i in {1..30}; do # Ждем до 30 секунд
-            curl -sf -o /dev/null http://localhost:3002/healthz && echo "App started!" && exit 0
-            sleep 1
+          timeout=60 # Общее время ожидания в секундах
+          interval=2  # Интервал проверки в секундах
+          elapsed=0
+          while [ $elapsed -lt $timeout ]; do
+            # -sfL: s-silent, f-fail fast (без вывода ошибки curl), L-follow redirects
+            # -o /dev/null: не выводить тело ответа
+            # -w "%{http_code}": вывести только HTTP код
+            HTTP_CODE=$(curl -sfL -o /dev/null -w "%{http_code}" http://localhost:3002/healthz || echo "curl_error")
+            echo "Attempt $(($elapsed / $interval + 1)): Status from http://localhost:3002/healthz - $HTTP_CODE"
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              echo "Application started successfully on port 3002!"
+              exit 0
+            fi
+            # Проверка, слушается ли порт, если curl не может соединиться
+            if [ "$HTTP_CODE" == "curl_error" ] || [ "$HTTP_CODE" == "000" ]; then
+                echo "Port 3002 might not be listened to or app not ready. Checking with ss..."
+                ss -tulnp | grep LISTEN | grep ':3002' || echo "Port 3002 not found in ss output."
+            fi
+            sleep $interval
+            elapsed=$(($elapsed + $interval))
           done
-          echo "Application did not start in time!" && exit 1
+          echo "Application did not start on port 3002 within ${timeout} seconds or /healthz is not responding correctly!"
+          exit 1
         shell: bash
 
       - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.10.0
+        uses: zaproxy/action-baseline@v0.10.0 # Можно проверить на 최신 версию
         with:
-          target: 'http://localhost:3002' 
+          target: 'http://localhost:3002'
+          # rules_file_name: '.zap/baseline-rules.tsv' # Создайте этот файл в репо, если нужно игнорировать правила
+          cmd_options: '-a -j' # -a включает альфа-правила, -j генерирует JSON отчет
+          # fail_action: 'true' # Раскомментируйте, чтобы workflow падал при НАЙДЕННЫХ ZAP уязвимостях (WARN или выше)
 
-      - name: Upload ZAP Report
+      - name: Upload ZAP Baseline Scan Report
         uses: actions/upload-artifact@v4
         if: always() # Загружать отчет ZAP всегда
         with:
           name: zap-baseline-report-${{ github.run_id }}
-          path: zaproxy-report.html # Имя файла отчета по умолчанию для action-baseline
-          retention-days: 30
+          path: | # Загружаем все сгенерированные отчеты ZAP
+            zaproxy-report.html
+            report.json 
+            report.xml
+            # Имена файлов могут немного отличаться в зависимости от версии action-baseline
+            # проверьте артефакты предыдущих запусков, если они были.
+          retention-days: 7 # Можно уменьшить срок хранения для DAST отчетов
