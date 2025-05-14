@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-report${{ github.run_id }} # Уникальное имя
+          name: allure-report-${{ github.run_id }} # Уникальное имя
           path: allure-report
           retention-days: 30
           
