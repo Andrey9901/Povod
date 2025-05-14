@@ -121,10 +121,10 @@ jobs:
       - name: Start application for ZAP Scan
         run: npm run start:ci & # Запускаем в фоне
         env:
-          MONGODB_URI: mongodb://localhost:27019/povod_test
+          MONGODB_URI: mongodb://localhost:27019/povod
           PORT: 3002
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_dast'
-          NODE_ENV: 'test'
+          NODE_ENV: 'development'
 
       - name: Wait for application to be ready on port 3002
         run: |
