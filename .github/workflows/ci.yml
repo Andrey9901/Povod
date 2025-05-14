@@ -56,7 +56,7 @@ jobs:
           retention-days: 7
 
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1
+        run: npm install -g allure-commandline
 
       - name: Create Allure Environment Properties
         if: always()
