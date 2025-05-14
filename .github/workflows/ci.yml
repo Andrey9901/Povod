@@ -1,5 +1,4 @@
-﻿# .github/workflows/ci.yml
-name: Povod CI - Full Test Suite
+﻿name: Povod CI - Full Test Suite
 
 on:
   push:
@@ -58,7 +57,7 @@ jobs:
           retention-days: 7
 
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1.6.0 # Используем конкретную версию для стабильности (или @v1 для последней мажорной)
+        uses: allure-framework/setup-allurectl@v1 # Используем конкретную версию для стабильности (или @v1 для последней мажорной)
 
       - name: Create Allure Environment Properties
         if: always()
