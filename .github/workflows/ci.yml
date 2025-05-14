@@ -10,6 +10,49 @@ on:
       - main
 
 jobs:
+  zap_baseline_scan:
+    runs-on: ubuntu-latest
+     name: ZAP Baseline Scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Setup Node.js (for DAST target app)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      - name: Install dependencies (for DAST target app)
+        run: npm ci
+      - name: Start application for ZAP Scan
+        run: npm run start:ci &
+        env:
+          MONGODB_URI: mongodb://localhost:27017/povod_test
+          PORT: 3002
+          SESSION_SECRET: 'dast_secret_key'
+      - name: Wait for application to start
+        run: |
+          sleep 30 # Даем приложению время на запуск
+          curl -I http://localhost:3002/healthz # Проверяем healthz
+
+      # Запускаем ZAP Baseline Scan
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0 # Используем официальный ZAP action
+        with:
+          # target: 'https://your-staging-app-url.com' # Если сканируем внешний URL
+          target: 'http://localhost:3002' # Сканируем приложение, запущенное в этом job
+          rules_file_name: '.zap/rules.tsv' # Опционально: файл с правилами для игнорирования
+          cmd_options: '-a' # Включить альфа-правила (более новые, могут быть нестабильны)
+          # docker_name: 'owasp/zap2docker-stable' # Можно указать Docker image ZAP
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        if: always() # Загружать отчет всегда
+        with:
+          name: zap-baseline-report
+          path: zaproxy-report.html # Имя файла отчета по умолчанию для action-baseline
+
   test-and-report:
     runs-on: ubuntu-latest
     permissions:
