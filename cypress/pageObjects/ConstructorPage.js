@@ -1,5 +1,4 @@
-﻿// cypress/pageObjects/ConstructorPage.js
-import Header from './Header';
+﻿import Header from './Header';
 
 class ConstructorPage {
     // --- Селекторы ---
@@ -83,12 +82,12 @@ class ConstructorPage {
         return this;
     }
 
-    verifyPreviewBackgroundColor(expectedColor) { // expectedColor здесь используется
+    verifyPreviewBackgroundColor(expectedColor) {
         this.clothingImageInPreview.should('have.css', 'background-color', expectedColor);
         return this;
     }
 
-    verifyTextInPreview(expectedText) { // expectedText здесь используется
+    verifyTextInPreview(expectedText) {
         this.customizationLayer.should('contain.text', expectedText);
         return this;
     }
@@ -102,11 +101,9 @@ class ConstructorPage {
         return this;
     }
 
-    // Убран неиспользуемый параметр expectedColor
     waitForAndVerifySaveDesignApiRequestData() {
         cy.wait('@createProductApi').then((interception) => {
             expect(interception.request.method).to.eq('POST');
-            // Дальнейшие проверки тела запроса FormData могут быть сложными и лучше делать их в API-тестах
         });
         return this;
     }

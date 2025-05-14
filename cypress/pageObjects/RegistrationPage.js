@@ -1,6 +1,4 @@
-﻿// cypress/pageObjects/RegistrationPage.js
-
-class RegistrationPage {
+﻿class RegistrationPage {
     // Селекторы
     get pageTitle() {
         return cy.get('h1', { timeout: 10000 });
@@ -30,7 +28,7 @@ class RegistrationPage {
         return cy.get('a[href="/login"]');
     }
 
-    // Селекторы для сообщений об ошибках полей (согласно вашему register.html)
+    // Селекторы для сообщений об ошибках полей
     get usernameError() {
         return cy.get('#username-error');
     }

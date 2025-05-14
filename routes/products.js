@@ -1,8 +1,6 @@
-// routes/products.js
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-//const { isLoggedIn, isAdmin } = require('../middleware/authMiddleware');
 const productService = require('../services/productService');
 
 // Получение всех продуктов (публичный эндпоинт)
@@ -22,12 +20,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const productId = req.params.id;
     console.log(`[SERVER LOG] Received request for product ID: ${productId}`);
-    // --- ДОБАВЛЕНА ПРОВЕРКА ФОРМАТА ID ---
     if (!mongoose.Types.ObjectId.isValid(productId)) {
         // Если ID не соответствует формату ObjectId, возвращаем 400 Bad Request
         return res.status(400).json({ message: 'Некорректный формат ID продукта.' });
     }
-    // --- КОНЕЦ ПРОВЕРКИ ---
 
     try {
         // Вызываем сервис только если формат ID корректный
@@ -50,7 +46,6 @@ router.get('/:id', async (req, res) => {
 });
 
 // Создание нового продукта (защищенный эндпоинт)
-//router.post('/', isLoggedIn, isAdmin, async (req, res) => {
 router.post('/', async (req, res) => { // Вариант без middleware
     const { color, designImage } = req.body;
     const productInputData = { color, designImage };

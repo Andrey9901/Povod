@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 1. Получение всех заказов пользователя
+// Получение всех заказов пользователя
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const userId = req.user.username; // Идентификатор пользователя из сессии
@@ -24,7 +24,7 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
-// 2. Создание нового заказа
+// Создание нового заказа
 router.post(
     '/',
     [
@@ -58,7 +58,7 @@ router.post(
     }
 );
 
-// 3. Получение конкретного заказа
+// Получение конкретного заказа
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -75,7 +75,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// 4. Обновление заказа
+// Обновление заказа
 router.put(
     '/:id',
     [
@@ -115,7 +115,7 @@ router.put(
     }
 );
 
-// 5. Удаление заказа
+// Удаление заказа
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const orderId = req.params.id;

@@ -1,6 +1,4 @@
-﻿// cypress/e2e/api/products.cy.js
-
-describe('API Продуктов - /products', () => {
+﻿describe('API Продуктов - /products', () => {
     let currentSeededProductForIt;
 
     beforeEach(() => {
@@ -39,11 +37,6 @@ describe('API Продуктов - /products', () => {
             cy.log('CYPRESS: Конец beforeEach');
         });
     });
-
-    // Опционально: отключаемся от БД после всех тестов в этом файле
-    // after(() => {
-    //     cy.task('dbDisconnect');
-    // });
 
     describe('GET /products', () => {
         it('должен получать список продуктов (массив), содержащий созданный продукт', () => {

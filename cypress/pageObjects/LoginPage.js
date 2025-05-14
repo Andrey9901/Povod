@@ -1,6 +1,4 @@
-﻿// cypress/pageObjects/LoginPage.js
-
-class LoginPage {
+﻿class LoginPage {
     // Селекторы элементов
     get usernameInput() {
         return cy.get('#username');
@@ -22,7 +20,7 @@ class LoginPage {
         return cy.get('h1', { timeout: 10000 });
     }
 
-    // Селекторы для сообщений об ошибках полей (согласно вашему login.html)
+    // Селекторы для сообщений об ошибках полей
     get usernameError() {
         return cy.get('#username-error');
     }

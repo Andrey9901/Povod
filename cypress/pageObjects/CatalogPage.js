@@ -1,5 +1,4 @@
-﻿// cypress/pageObjects/CatalogPage.js
-import Header from './Header'; // Шапка есть на всех страницах
+﻿import Header from './Header'; // Шапка есть на всех страницах
 
 class CatalogPage {
     // --- Селекторы ---
@@ -8,9 +7,7 @@ class CatalogPage {
     }
 
     get pageDescription() {
-        // Если есть описание под заголовком, например:
-        // return cy.get('.catalog-content > .container > p').first(); // Нужно уточнить селектор
-        return cy.get('section.catalog-content .container > p').first(); // Исходя из catalog.html
+        return cy.get('section.catalog-content .container > p').first();
     }
 
     get searchInput() {
@@ -18,9 +15,7 @@ class CatalogPage {
     }
 
     get searchButton() {
-        // return cy.get('form.search-form button[type="submit"]');
-        // Более надежно, если форма или кнопка уникальны
-        return cy.get('.search-button'); // Исходя из HTML, у кнопки есть этот класс
+        return cy.get('.search-button');
     }
 
     get productsContainer() {
@@ -72,13 +67,12 @@ class CatalogPage {
     }
 
     verifyProductIsNotVisible(productName) {
-        this.getProductCardByName(productName).should('not.exist'); // Или .should('not.be.visible') если элемент скрыт, но есть в DOM
+        this.getProductCardByName(productName).should('not.exist');
         return this;
     }
 
     verifyHeaderIsVisible() {
         Header.isVisible();
-        // Можно добавить проверки конкретных ссылок в шапке, если нужно
         Header.navLinkCatalog.should('be.visible');
     }
 

@@ -1,8 +1,6 @@
-﻿// services/productService.js
-const Product = require('../models/Product');
+﻿const Product = require('../models/Product');
 const mongoose = require('mongoose');
 
-// ... остальной код productService.js без изменений ...
 async function createProduct(productData, userId) {
     const { color, designImage } = productData;
 

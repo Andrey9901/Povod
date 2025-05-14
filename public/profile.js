@@ -1,4 +1,3 @@
-// public/profile.js
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Profile.js: DOMContentLoaded, starting fetch.'); // Лог старта
 

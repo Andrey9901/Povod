@@ -1,5 +1,4 @@
-﻿// cypress/e2e/ui/main_page.ui.cy.js
-import Header from '../../pageObjects/Header';
+﻿import Header from '../../pageObjects/Header';
 
 describe('UI Тесты - Главная страница', () => {
 

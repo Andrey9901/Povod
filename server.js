@@ -1,4 +1,3 @@
-// project_new/server.js
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -8,7 +7,7 @@ const multer = require('multer');
 const app = express();
 
 // --- Импорт роутеров ---
-const authRoutes = require('./routes/auth'); // <--- ПРОВЕРЬТЕ ЭТОТ ПУТЬ! От корня проекта к routes/
+const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 
 // --- Базовые Middleware ---
@@ -141,7 +140,6 @@ app.get('/healthz', (_req, res) => {
 
 // 404 handler
 app.use((_req, res, _next) => {
-    // Отправляем 404.html, если он у вас есть, или просто текст
     const filePath404 = path.join(__dirname, 'public', '404.html');
     if (require('fs').existsSync(filePath404)) {
         res.status(404).sendFile(filePath404);

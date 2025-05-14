@@ -1,9 +1,7 @@
-﻿// cypress/pageObjects/Header.js
-
-class Header {
+﻿class Header {
     // Селекторы элементов шапки
     get logoLink() {
-        return cy.get('header.header a[href="/"]'); // Или /index.html, если это ваш основной путь
+        return cy.get('header.header a[href="/"]');
     }
 
     get navMenu() {
@@ -11,7 +9,7 @@ class Header {
     }
 
     get navLinkMain() {
-        return this.navMenu.find('ul li a[href="/"]'); // Или /index.html
+        return this.navMenu.find('ul li a[href="/"]');
     }
 
     get navLinkCatalog() {
@@ -27,7 +25,6 @@ class Header {
     }
 
     get searchIcon() {
-        // Если у иконки поиска есть более специфичный селектор, используйте его
         return cy.get('header.header .header-actions a.action-icon i.fa-search').parent('a');
     }
 
@@ -42,7 +39,6 @@ class Header {
     }
 
     get cartIconLink() {
-        // Если у иконки корзины есть более специфичный селектор
         return cy.get('header.header .header-actions a.action-icon.cart-icon');
     }
 
@@ -87,7 +83,6 @@ class Header {
     navLinkMainShouldBeVisibleAndContain(text) {
         this.navLinkMain.should('be.visible').and('contain', text);
     }
-    // ... аналогичные методы для других ссылок навигации, если нужно
 }
 
 export default new Header();

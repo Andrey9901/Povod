@@ -1,12 +1,11 @@
-﻿// eslint.config.js
-const globals = require('globals');
+﻿const globals = require('globals');
 const nodePlugin = require('eslint-plugin-node');
 const securityPlugin = require('eslint-plugin-security');
 const esxPlugin = require('eslint-plugin-es-x');
 const cypressPlugin = require('eslint-plugin-cypress');
 
 module.exports = [
-    // 0. Глобально игнорируем все, что точно не JavaScript или не должно линтиться
+    // Глобально игнорируем все, что точно не JavaScript или не должно линтиться
     {
         ignores: [
             'node_modules/**',
@@ -30,11 +29,11 @@ module.exports = [
             '.github/workflows/*.yml',
             'allure-results/**',
             'allure-report/**',
-            'eslint.config.js', // Сам файл конфигурации тоже игнорируем от всех правил по умолчанию
+            'eslint.config.js',
         ],
     },
 
-    // 1. Конфигурация для серверного JavaScript кода
+    // Конфигурация для серверного JavaScript кода
     {
         files: [ // Применяем к файлам, которые НЕ БЫЛИ исключены глобально и НЕ будут обработаны другими блоками
             '*.js',             // Файлы .js в корне (server.js, jest.config.js и т.д.)
@@ -42,13 +41,11 @@ module.exports = [
             'services/**/*.js',
             'models/**/*.js',
             'utils/**/*.js',
-            'tests/**/*.js',    // Для Jest тестов
-            // Исключаем то, что будет обработано другими, более специфичными блоками:
+            'tests/**/*.js',
             '!public/**/*.js',
             '!cypress/**/*.js',
             '!cypress.config.js',
         ],
-        // Убрали excludedFiles отсюда
         languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'commonjs',
@@ -56,7 +53,6 @@ module.exports = [
         },
         plugins: { node: nodePlugin, security: securityPlugin, 'es-x': esxPlugin },
         rules: {
-            // ... (правила для серверного кода остаются такими же, как в предыдущем ответе) ...
             ...nodePlugin.configs.recommended.rules,
             ...securityPlugin.configs.recommended.rules,
             'indent': ['warn', 4, { 'SwitchCase': 1 }],
@@ -79,7 +75,7 @@ module.exports = [
         },
     },
 
-    // 2. Конфигурация для фронтенд-кода в public/ (только .js файлы)
+    // Конфигурация для фронтенд-кода в public/ (только .js файлы)
     {
         files: ['public/**/*.js'],
         languageOptions: {
@@ -94,10 +90,8 @@ module.exports = [
         }
     },
 
-    // 3. Конфигурация для файлов тестов Cypress и cypress.config.js
+    // Конфигурация для файлов тестов Cypress и cypress.config.js
     {
-        // Этот блок должен идти после основного блока для .js, чтобы переопределить для Cypress файлов,
-        // или убедиться, что основной блок их исключает.
         files: ['cypress/**/*.js', 'cypress.config.js'],
         plugins: { cypress: cypressPlugin },
         languageOptions: {
@@ -111,9 +105,4 @@ module.exports = [
             'security/detect-non-literal-fs-filename': 'off',
         }
     },
-
-    // Отдельный блок для eslint.config.js больше не нужен, так как он добавлен в глобальные ignores.
-    // Если вы хотите его все же линтить (например, базовыми правилами ESLint), то нужно убрать
-    // 'eslint.config.js' из глобальных ignores и создать для него отдельный блок без nodePlugin.
-    // Но проще его просто игнорировать.
 ];

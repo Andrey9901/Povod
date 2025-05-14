@@ -1,7 +1,6 @@
-﻿// cypress/e2e/ui/static_pages.cy.js
-import Header from '../../pageObjects/Header';
+﻿import Header from '../../pageObjects/Header';
 
-describe('UI Тесты - Просмотр информационных страниц (с POM для Header)', () => { // Название describe можно обновить
+describe('UI Тесты - Просмотр информационных страниц (с POM для Header)', () => {
 
     describe('Страница "О нас"', () => {
         beforeEach(() => {
@@ -26,7 +25,7 @@ describe('UI Тесты - Просмотр информационных стра
         it('должна содержать навигационное меню и ссылки в шапке', () => {
             Header.isVisible();
             Header.navLinkMain.should('contain', 'Главная');
-            Header.navLinkCatalog.should('contain', 'Каталог'); // Эти проверки общие для шапки
+            Header.navLinkCatalog.should('contain', 'Каталог');
             Header.navLinkConstructor.should('contain', 'Конструктор');
             Header.navLinkAbout.should('contain', 'О нас');
             Header.loginIconLink.should('be.visible');

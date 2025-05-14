@@ -1,4 +1,3 @@
-// public/constructor.js
 const clothingImage = document.getElementById('clothing-image');
 const customizationLayer = document.getElementById('customization-layer');
 const colorSelect = document.getElementById('color-select');
@@ -49,7 +48,6 @@ async function saveDesign() {
             if (!response.ok) {
                 let errorMessage = 'Ошибка при сохранении дизайна.';
                 try {
-                    // Пытаемся получить более детальное сообщение об ошибке от сервера
                     const errorData = await response.json();
                     if (errorData && errorData.message) {
                         errorMessage = errorData.message;

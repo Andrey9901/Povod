@@ -22,8 +22,6 @@
 
         <!-- Сообщение об ошибке от сервера -->
         <div id="server-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-        <!-- Убраны action/method, используется JS -->
         <form class="auth-form" id="register-form" novalidate>
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
@@ -95,8 +93,6 @@
             if (password !== confirmPassword) {
                 confirmPasswordError.textContent = 'Пароли не совпадают.'; hasClientError = true;
             }
-            // Можно добавить проверку сложности пароля на клиенте, но серверная надежнее
-            // --- Конец Клиентской Валидации ---
 
             if (hasClientError) return;
 

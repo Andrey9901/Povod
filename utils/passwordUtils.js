@@ -1,6 +1,4 @@
-// project_new/utils/passwordUtils.js
 const bcrypt = require('bcryptjs');
-
 const SALT_ROUNDS = 10;
 
 /**

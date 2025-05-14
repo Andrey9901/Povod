@@ -1,5 +1,4 @@
-﻿// cypress/e2e/ui/auth.ui.cy.js
-import LoginPage from '../../pageObjects/LoginPage';
+﻿import LoginPage from '../../pageObjects/LoginPage';
 import RegistrationPage from '../../pageObjects/RegistrationPage';
 import ProfilePage from '../../pageObjects/ProfilePage';
 import Header from '../../pageObjects/Header';
@@ -8,11 +7,7 @@ describe('UI Тесты - Аутентификация пользователя 
     const runTimestamp = Date.now();
 
     // Функция для генерации тестовых данных пользователя
-    // Убедимся, что префикс не слишком длинный, чтобы итоговое имя пользователя
-    // не превышало ограничений клиентской валидации (например, 30 символов).
     const generateUserData = (testIdPrefix) => {
-        // Ограничим длину префикса, чтобы вместе с timestamp не выйти за лимиты
-        // Пример: если timestamp - 13 символов, плюс подчеркивание, то префикс ~10-15 символов безопасен для username(30)
         const safePrefix = testIdPrefix.length > 12 ? testIdPrefix.substring(0, 12) : testIdPrefix;
         return {
             username: `${safePrefix}_${runTimestamp}`,
@@ -73,16 +68,7 @@ describe('UI Тесты - Аутентификация пользователя 
             RegistrationPage.usernameError.should('be.visible').and('contain', 'Имя пользователя: 3-30 символов.');
             RegistrationPage.emailError.should('be.visible').and('contain', 'Введите корректный email.');
             RegistrationPage.passwordError.should('be.visible').and('contain', 'Пароль: минимум 8 символов.');
-            // Если оба поля пароля пустые, password === confirmPassword (пустая строка === пустая строка),
-            // поэтому сообщение "Пароли не совпадают" НЕ должно появляться от условия (password !== confirmPassword).
-            // Если бы была отдельная проверка на пустоту confirmPassword, она бы сработала.
-            // Для этого случая ожидаем, что confirmPasswordError либо пустое, либо содержит стандартное сообщение (если есть).
-            // Пока проверим просто видимость, так как JS его очищает.
             RegistrationPage.confirmPasswordError.should('be.visible');
-            // Если бы confirmPassword должен был быть заполнен, то при пустом password и пустом confirmPassword
-            // ошибка "Пароли не совпадают" НЕ возникает из-за password !== confirmPassword.
-            // Но если бы password был заполнен, а confirmPassword пуст, ТОГДА "Пароли не совпадают" сработало бы.
-
             cy.url().should('include', '/register');
         });
 
@@ -123,9 +109,6 @@ describe('UI Тесты - Аутентификация пользователя 
             RegistrationPage.fillPassword(existingUserData.password);
             RegistrationPage.fillConfirmPassword(existingUserData.password);
             RegistrationPage.submitRegistrationForm();
-
-            // Ожидаем, что #server-error теперь получит сообщение от сервера
-            // и будет видимым (Cypress автоматически ждет видимости перед проверкой текста)
             RegistrationPage.serverError.should('contain', 'Имя пользователя уже используется');
             cy.url().should('include', '/register');
         });

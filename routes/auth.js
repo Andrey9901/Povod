@@ -1,8 +1,7 @@
-// project_new/routes/auth.js
 const express = require('express');
 const router = express.Router();
-const { comparePasswords } = require('../utils/passwordUtils'); // Путь от 'routes/' к 'utils/'
-const userService = require('../services/userService');   // <--- ПРОВЕРЬТЕ ЭТОТ ПУТЬ! От 'routes/' к 'services/'
+const { comparePasswords } = require('../utils/passwordUtils');
+const userService = require('../services/userService');
 
 // POST /auth/login
 router.post('/login', async (req, res) => {

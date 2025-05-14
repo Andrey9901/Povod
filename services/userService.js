@@ -1,8 +1,6 @@
-// services/userService.js
 const User = require('../models/User');
 const { hashPassword } = require('../utils/passwordUtils');
 
-// ... остальной код userService.js без изменений ...
 async function findUserByUsername(username) {
     if (!username || typeof username !== 'string' || username.trim() === '') {
         return null;

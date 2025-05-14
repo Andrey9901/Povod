@@ -1,6 +1,5 @@
-﻿// cypress/e2e/ui/catalog.ui.cy.js
-import CatalogPage from '../../pageObjects/CatalogPage';
-import Header from '../../pageObjects/Header'; // Header все еще может быть нужен
+﻿import CatalogPage from '../../pageObjects/CatalogPage';
+import Header from '../../pageObjects/Header';
 
 describe('UI Тесты - Страница Каталога (с POM)', () => {
 
@@ -9,7 +8,7 @@ describe('UI Тесты - Страница Каталога (с POM)', () => {
     });
 
     it('должна успешно загружаться и содержать правильный заголовок', () => {
-        cy.title().should('include', 'Каталог - Povod'); // Проверка title остается
+        cy.title().should('include', 'Каталог - Povod');
         CatalogPage.pageTitle.should('contain', 'Каталог товаров'); // Используем POM
     });
 
@@ -25,7 +24,6 @@ describe('UI Тесты - Страница Каталога (с POM)', () => {
         Header.navLinkCatalog.should('be.visible');
     });
 
-    // --- Сюда добавляем НОВЫЕ тесты для поиска, которые я предлагал ранее ---
     it('должна корректно выполнять поиск существующего товара', () => {
         const productNameToSearch = 'Вышивка на свитшоте';
         CatalogPage.searchForProduct(productNameToSearch);
@@ -41,8 +39,6 @@ describe('UI Тесты - Страница Каталога (с POM)', () => {
     it('должна отображать все товары после очистки поля поиска', () => {
         const productNameToSearch = 'Вышивка на свитшоте';
         CatalogPage.searchForProduct(productNameToSearch);
-        // CatalogPage.verifyNumberOfProductsDisplayed(1); // Уточните ожидаемое поведение
-
         CatalogPage.searchForProduct(''); // Очищаем поиск
         CatalogPage.productsContainer.find('.product').its('length').should('be.gt', 1);
     });

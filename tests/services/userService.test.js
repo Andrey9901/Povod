@@ -1,17 +1,11 @@
-// tests/services/userService.test.js
-const userService = require('@services/userService'); // Используем псевдоним, если будете менять везде
-// или оставьте старый: const userService = require('../../services/userService');
-
-// Этот require User здесь для тестов, но он будет заменен моком из-за jest.mock ниже
-const User = require('@models/User'); // Используем псевдоним
-const { hashPassword } = require('@utils/passwordUtils'); // Используем псевдоним
+const userService = require('@services/userService');
+const User = require('@models/User');
+const { hashPassword } = require('@utils/passwordUtils');
 
 jest.mock('@models/User');
 jest.mock('@utils/passwordUtils');
 
 describe('UserService', () => {
-    // ... остальной код теста userService.test.js из моего предыдущего полного ответа ...
-    // (все describe и it блоки)
     let mockUserData;
 
     beforeEach(() => {

@@ -1,14 +1,11 @@
-﻿// cypress/e2e/api/auth.cy.js
-describe('API Аутентификации', () => {
-    // Helper function to generate unique user data for each test run if needed,
-    // or specific suffixes for different test cases.
+﻿describe('API Аутентификации', () => {
     const generateUserData = (suffix) => {
-        const timestamp = Date.now(); // Ensures uniqueness across test runs
+        const timestamp = Date.now();
         return {
             username: `testuser_${suffix}_${timestamp}`,
             email: `test_${suffix}_${timestamp}@example.com`,
             password: 'Password123!',
-            confirmPassword: 'Password123!' // Default to matching for simplicity
+            confirmPassword: 'Password123!'
         };
     };
 
@@ -20,7 +17,6 @@ describe('API Аутентификации', () => {
                 method: 'POST',
                 url: '/auth/register',
                 body: newUserInput,
-                // failOnStatusCode: false // Not needed if expecting 201
             }).then((response) => {
                 expect(response.status).to.eq(201);
                 expect(response.body).to.be.an('object');
@@ -126,9 +122,6 @@ describe('API Аутентификации', () => {
                     expect(response.body.message).to.contain('Все поля');
                 });
         });
-
-        // Можно добавить тесты на длину полей, если есть серверная валидация
-        // it('должен возвращать ошибку 400, если username слишком короткий', () => { ... });
     });
 
     // --- Тесты Логина ---
@@ -228,16 +221,10 @@ describe('API Аутентификации', () => {
             cy.request({
                 method: 'GET',
                 url: '/auth/logout',
-                // failOnStatusCode: false // Не нужен, если ожидаем 200
             }).then((response) => {
                 expect(response.status).to.eq(200);
                 expect(response.body.success).to.be.true;
                 expect(response.body.message).to.eq('Выход выполнен успешно.');
-
-                // Дополнительная проверка: пытаемся получить доступ к защищенному ресурсу (если есть)
-                // или проверяем, что сессионная кука удалена (это сложнее напрямую)
-                // Например, если бы /api/profile был защищен и вернул бы 401 после logout
-                // cy.request({ url: '/api/profile', failOnStatusCode: false }).its('status').should('eq', 401);
             });
         });
 

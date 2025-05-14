@@ -1,7 +1,6 @@
-﻿// cypress.config.js
-const { defineConfig } = require('cypress');
+﻿const { defineConfig } = require('cypress');
 const mongoose = require('mongoose');
-const Product = require('./models/Product'); // Убедитесь, что путь к вашей Mongoose модели Product правильный
+const Product = require('./models/Product');
 const allureWriter = require('@shelex/cypress-allure-plugin/writer');
 
 let mongooseConnection = null;
@@ -91,15 +90,10 @@ module.exports = defineConfig({
                     if (id === null || typeof id === 'undefined') return false;
                     return mongoose.Types.ObjectId.isValid(id.toString());
                 },
-                generateValidObjectId() { // Новая задача
+                generateValidObjectId() {
                     return new mongoose.Types.ObjectId().toString();
                 }
             });
-
-            // Если используете Allure, его настройка должна быть здесь
-            // const allureWriter = require('@shelex/cypress-allure-plugin/writer');
-            // allureWriter(on, config);
-
             return config;
         },
         env: {

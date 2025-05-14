@@ -1,8 +1,6 @@
-// public/script.js
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
-    // const cartIcon = document.querySelector('.cart-icon'); // Переменная не использовалась
-    const cartCount = document.querySelector('.cart-count'); // Эта переменная используется
+    const cartCount = document.querySelector('.cart-count');
     const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -42,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateCartCount() {
-        if (cartCount) { // Добавим проверку, что cartCount найден
+        if (cartCount) {
             const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
             cartCount.textContent = totalItems;
         }

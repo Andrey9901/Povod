@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет - Povod</title>
-    <link rel="stylesheet" href="/styles.css"> <!-- Убедитесь, что этот CSS существует -->
+    <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -66,7 +66,7 @@
                     <button class="btn">Подробнее</button>
                 </div>
                 <div class="profile-section orders-section">
-                    <h2>Мои созданные продукты</h2> <!-- Название изменено -->
+                    <h2>Мои созданные продукты</h2>
                     <div id="orders-list">Загрузка...</div> <!-- Для списка продуктов -->
                     <p>Всего: <span id="orders-count">0</span></p> <!-- Счетчик продуктов -->
                 </div>
@@ -89,12 +89,11 @@
     <!-- Подключение JavaScript для загрузки данных профиля -->
     <script src="/profile.js"></script>
     <script>
-        // Этот скрипт может быть в profile.js или прямо здесь, или в общем файле скриптов
         document.addEventListener('DOMContentLoaded', () => {
             const logoutLink = document.getElementById('logout-link');
             if (logoutLink) {
                 logoutLink.addEventListener('click', async (event) => {
-                    event.preventDefault(); // Предотвращаем стандартный переход по ссылке (если бы href остался)
+                    event.preventDefault();
                     console.log('Logout link clicked'); // Лог
 
                     try {

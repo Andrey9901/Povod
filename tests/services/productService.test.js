@@ -1,15 +1,10 @@
-﻿// tests/services/productService.test.js
-const productService = require('@services/productService'); // Используем псевдоним
-// или оставьте старый: const productService = require('../../services/productService');
-
-const Product = require('@models/Product'); // Используем псевдоним
+﻿const productService = require('@services/productService');
+const Product = require('@models/Product');
 const mongoose = require('mongoose');
 
 jest.mock('@models/Product');
 
 describe('ProductService', () => {
-    // ... остальной код теста productService.test.js из моего предыдущего полного ответа ...
-    // (все describe и it блоки)
     let mockProductInputData;
     let mockUserId;
     let mockSavedProductData;

@@ -1,21 +1,20 @@
-const { hashPassword, comparePasswords } = require('../utils/passwordUtils');
+﻿const { hashPassword, comparePasswords } = require('../utils/passwordUtils');
 
 describe('Password Utilities', () => {
     const testPassword = 'MySecurePassword123!';
     let hashedPassword;
 
-    // ����� ��� ������� hashPassword
     describe('hashPassword', () => {
         it('should hash a given password', async () => {
             hashedPassword = await hashPassword(testPassword);
             expect(hashedPassword).toBeDefined();
             expect(typeof hashedPassword).toBe('string');
-            expect(hashedPassword.length).toBeGreaterThan(testPassword.length); // ��� ������ ���� ������� ���������
+            expect(hashedPassword.length).toBeGreaterThan(testPassword.length); 
         });
 
         it('should produce a different hash for the same password if called again (due to salt)', async () => {
             const hashedPasswordAgain = await hashPassword(testPassword);
-            expect(hashedPasswordAgain).not.toBe(hashedPassword); // ���� ������ ��� ��, ���� ������ ��-�� ����
+            expect(hashedPasswordAgain).not.toBe(hashedPassword); 
         });
 
         it('should throw an error if password is not provided or empty', async () => {
@@ -25,11 +24,8 @@ describe('Password Utilities', () => {
         });
     });
 
-    // ����� ��� ������� comparePasswords
     describe('comparePasswords', () => {
-        // ����� ����� ������� ��� ����� ���������� hashedPassword
         beforeAll(async () => {
-            // ��������, ��� � ��� ���� ������ ��� ��� ������ ���������
             if (!hashedPassword) {
                 hashedPassword = await hashPassword(testPassword);
             }

@@ -1,7 +1,5 @@
-﻿// cypress/e2e/ui/constructor.ui.cy.js
-import ConstructorPage from '../../pageObjects/ConstructorPage';
+﻿import ConstructorPage from '../../pageObjects/ConstructorPage';
 import LoginPage from '../../pageObjects/LoginPage'; // Импортируем LoginPage
-// import Header from '../../pageObjects/Header'; // Если нужен
 
 describe('UI Тесты - Страница Конструктора (с POM)', () => {
     let testUserData; // Для доступа к данным пользователя
@@ -9,8 +7,6 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
     before(() => {
         cy.fixture('testUser').then((user) => { // Загружаем один раз для всего describe
             testUserData = user;
-            // Регистрация пользователя (код из пункта 2 выше)
-            // Убедитесь, что пользователь будет существовать к моменту запуска тестов
             cy.request({
                 method: 'POST',
                 url: '/auth/register',
@@ -30,7 +26,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
         });
     });
 
-    // Тесты, не требующие авторизации (если такие есть для конструктора)
+    // Тесты, не требующие авторизации
     describe('Общие проверки (без авторизации)', () => {
         beforeEach(() => {
             ConstructorPage.visit();
@@ -39,7 +35,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
         it('должна успешно загружаться и содержать правильный заголовок', () => {
             cy.title().should('include', 'Конструктор одежды - Povod');
             ConstructorPage.pageTitle.should('contain', 'Конструктор одежды');
-            ConstructorPage.verifyHeaderIsVisible(); // Header.isVisible() и Header.navLinkConstructor...
+            ConstructorPage.verifyHeaderIsVisible();
         });
 
         it('должна отображать область предпросмотра с изображением', () => {
@@ -51,7 +47,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
         it('должна изменять цвет фона изображения в предпросмотре', () => {
             ConstructorPage.selectColor('red');
             ConstructorPage.applyChanges();
-            ConstructorPage.verifyPreviewBackgroundColor('rgb(255, 0, 0)'); // Адаптируйте RGB если нужно
+            ConstructorPage.verifyPreviewBackgroundColor('rgb(255, 0, 0)');
         });
 
         it('должна добавлять текст в область предпросмотра', () => {
@@ -70,9 +66,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
             expect(testUserData, 'Test user data should be loaded').to.not.be.undefined; // Проверка, что testUserData загружены
             LoginPage.visit();
             LoginPage.login(testUserData.username, testUserData.password);
-            // Опционально: убедиться, что логин прошел успешно, например, редиректом на профиль
             cy.url().should('include', '/profile', { timeout: 10000 });
-            // Затем переходим на страницу конструктора
             ConstructorPage.visit();
         });
 
