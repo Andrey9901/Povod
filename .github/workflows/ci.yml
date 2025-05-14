@@ -73,14 +73,14 @@ jobs:
 
       - name: Generate Allure report for functional tests
         if: always() # Генерировать отчет всегда, чтобы видеть и прошедшие, и упавшие тесты
-        run: allurectl report generate --report-dir allure-report-functional allure-results
+        run: allure generate allure-results --clean -o allure-report
 
       - name: Upload Allure report (Functional Tests)
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-report-functional-${{ github.run_id }} # Уникальное имя
-          path: allure-report-functional
+          name: allure-report${{ github.run_id }} # Уникальное имя
+          path: allure-report
           retention-days: 30
           
       - name: Deploy Allure Report to GitHub Pages
