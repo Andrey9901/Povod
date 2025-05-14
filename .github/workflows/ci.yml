@@ -1,4 +1,4 @@
-﻿name: Povod CI - Full Test Suite
+﻿name: Povod CI 
 
 on:
   push:
@@ -13,10 +13,10 @@ jobs:
   build_and_test: # Первый job: сборка, линтинг, функциональные тесты, Allure отчет
     runs-on: ubuntu-latest
     services:
-      mongodb: # Сервис MongoDB для этого job'a
-        image: mongo:latest # Используем последнюю версию MongoDB
+      mongodb: 
+        image: mongo:latest 
         ports:
-          - 27017:27017 # Пробрасываем порт для доступа с localhost
+          - 27017:27017 
 
     steps:
       - name: Checkout code
@@ -25,26 +25,25 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x' # Рекомендуется использовать LTS версию Node.js
+          node-version: '18.x'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci # Используем 'ci' для более быстрой и надежной установки в CI
+        run: npm ci 
 
       - name: Run ESLint (SAST)
         run: npm run lint
 
       - name: Run Jest unit tests (generates Allure results)
-        run: npm run test:unit # Этот скрипт должен запускать Jest
+        run: npm run test:unit 
 
       - name: Run Cypress E2E tests (API & UI - generates Allure results)
-        # Ваш скрипт test:ci уже содержит start-server-and-test
         run: npm run test:ci 
         env:
-          MONGODB_URI: mongodb://localhost:27017/povod_ci_functional_db # БД для функциональных тестов
-          PORT: 3001 # Порт для приложения во время Cypress тестов
+          MONGODB_URI: mongodb://localhost:27017/povod_test
+          PORT: 3001
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_functional_tests'
-          # CYPRESS_BASE_URL: http://localhost:3001 # Обычно берется из cypress.config.js
+          # CYPRESS_BASE_URL: http://localhost:3001 
 
       - name: Store Cypress artifacts on failure
         if: failure() # Запускать только если предыдущие шаги упали
@@ -57,7 +56,7 @@ jobs:
           retention-days: 7
 
       - name: Set up Allure Commandline
-        uses: allure-framework/setup-allurectl@v1 # Используем конкретную версию для стабильности (или @v1 для последней мажорной)
+        uses: allure-framework/setup-allurectl@v1
 
       - name: Create Allure Environment Properties
         if: always()
@@ -74,8 +73,7 @@ jobs:
 
       - name: Generate Allure report for functional tests
         if: always() # Генерировать отчет всегда, чтобы видеть и прошедшие, и упавшие тесты
-        run: allurectl report generate --report-dir allure-report-functional allure-results # Используем allurectl
-        # Старая команда: allure generate allure-results --clean -o allure-report-functional
+        run: allure generate allure-results --clean -o allure-report
 
       - name: Upload Allure report (Functional Tests)
         uses: actions/upload-artifact@v4
@@ -85,17 +83,16 @@ jobs:
           path: allure-report-functional
           retention-days: 30
           
-      # Опционально: Деплой Allure отчета на GitHub Pages
-      # - name: Deploy Allure Report to GitHub Pages
-      #   if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./allure-report-functional # Публикуем отчет от функциональных тестов
-      #     user_name: 'github-actions[bot]'
-      #     user_email: 'github-actions[bot]@users.noreply.github.com' # Рекомендуемый email
-      #     commit_message: 'Deploy Allure report for functional tests ${{ github.sha }}'
-      #     force_orphan: true # Создает чистую ветку gh-pages каждый раз
+      - name: Deploy Allure Report to GitHub Pages
+        if: success() && (github.ref == 'refs/heads/main')
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@github.com'
+          commit_message: 'Allure report'
+          keep_files: true
 
   dast_zap_scan:
     runs-on: ubuntu-latest
@@ -122,13 +119,12 @@ jobs:
         run: npm ci
 
       - name: Start application for ZAP Scan
-        # Убедитесь, что скрипт 'start:ci' в package.json это 'node server.js'
         run: npm run start:ci & # Запускаем в фоне
         env:
-          MONGODB_URI: mongodb://localhost:27019/povod_dast_scan_db
+          MONGODB_URI: mongodb://localhost:27019/povod_test
           PORT: 3002
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_dast'
-          NODE_ENV: 'dast' # Или 'test', если ваше приложение использует эту переменную для конфигурации БД
+          NODE_ENV: 'test'
 
       - name: Wait for application to be ready on port 3002
         run: |
@@ -159,12 +155,10 @@ jobs:
         shell: bash
 
       - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.10.0 # Можно проверить на 최신 версию
+        uses: zaproxy/action-baseline@v0.10.0
         with:
           target: 'http://localhost:3002'
-          # rules_file_name: '.zap/baseline-rules.tsv' # Создайте этот файл в репо, если нужно игнорировать правила
           cmd_options: '-a -j' # -a включает альфа-правила, -j генерирует JSON отчет
-          # fail_action: 'true' # Раскомментируйте, чтобы workflow падал при НАЙДЕННЫХ ZAP уязвимостях (WARN или выше)
 
       - name: Upload ZAP Baseline Scan Report
         uses: actions/upload-artifact@v4
@@ -175,6 +169,4 @@ jobs:
             zaproxy-report.html
             report.json 
             report.xml
-            # Имена файлов могут немного отличаться в зависимости от версии action-baseline
-            # проверьте артефакты предыдущих запусков, если они были.
-          retention-days: 7 # Можно уменьшить срок хранения для DAST отчетов
+          retention-days: 7 
