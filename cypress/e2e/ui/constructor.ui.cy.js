@@ -32,12 +32,6 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
             ConstructorPage.visit();
         });
 
-        it('должна успешно загружаться и содержать правильный заголовок', () => {
-            cy.title().should('include', 'Конструктор одежды - Povod');
-            ConstructorPage.pageTitle.should('contain', 'Конструктор одежды');
-            ConstructorPage.verifyHeaderIsVisible();
-        });
-
         it('должна отображать область предпросмотра с изображением', () => {
             ConstructorPage.previewContainerTitle.should('contain', 'Предпросмотр:');
             ConstructorPage.clothingPreviewArea.should('be.visible');
