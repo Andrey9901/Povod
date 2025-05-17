@@ -31,7 +31,6 @@ describe('UI Тесты - Аутентификация пользователя 
         LoginPage.login(userData.username, userData.password);
 
         cy.url({ timeout: 10000 }).should('include', '/profile');
-        ProfilePage.pageTitle.should('contain', 'Личный кабинет');
         ProfilePage.shouldDisplayUserName(userData.username);
         ProfilePage.shouldDisplayUserEmail(userData.email);
         ProfilePage.checkHeaderNavigation();

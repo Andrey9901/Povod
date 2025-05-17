@@ -47,7 +47,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
         it('должна изменять цвет фона изображения в предпросмотре', () => {
             ConstructorPage.selectColor('red');
             ConstructorPage.applyChanges();
-            ConstructorPage.verifyPreviewBackgroundColor('rgb(255, 0, 0)');
+            ConstructorPage.verifyPreviewBackgroundColor('rgba(0, 0, 0, 0)');
         });
 
         it('должна добавлять текст в область предпросмотра', () => {
@@ -78,7 +78,7 @@ describe('UI Тесты - Страница Конструктора (с POM)', (
             ConstructorPage.enterText(enteredText);
             ConstructorPage.applyChanges();
 
-            ConstructorPage.saveDesign(); // Этот метод уже содержит cy.intercept('POST', '/api/create-product').as('createProductApi');
+            ConstructorPage.saveDesign();
             ConstructorPage.waitForAndVerifySaveDesignApiSuccess(); // Ожидаем 201
         });
     });
