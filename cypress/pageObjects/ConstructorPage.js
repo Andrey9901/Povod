@@ -3,7 +3,6 @@
 class ConstructorPage {
     // --- Селекторы ---
     get pageTitle() {
-        return cy.get('h1', { timeout: 10000 });
     }
 
     get previewContainerTitle() {
