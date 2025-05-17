@@ -1,7 +1,6 @@
 ﻿import Header from './Header'; // Профиль тоже имеет шапку
 
 class ProfilePage {
-    get pageTitle() { return cy.get('h1', { timeout: 10000 }); }
     get userNameDisplay() { return cy.get('#user-name', { timeout: 15000 }); }
     get userEmailDisplay() { return cy.get('#user-email', { timeout: 10000 }); }
     get avatarImage() { return cy.get('#user-avatar'); }
