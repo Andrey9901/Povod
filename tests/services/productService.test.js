@@ -37,7 +37,7 @@ describe('ProductService', () => {
     });
 
     describe('createProduct', () => {
-        it('should create and save a product with valid data', async () => {
+        it('должен создавать и сохранять продукт с валидными данными', async () => {
             const result = await productService.createProduct(mockProductInputData, mockUserId);
 
             expect(Product).toHaveBeenCalledTimes(1);
@@ -50,7 +50,7 @@ describe('ProductService', () => {
             expect(result).toEqual(mockSavedProductData);
         });
 
-        it('should use undefined for designImage if not provided and save is successful', async () => {
+        it('должен использовать undefined для designImage, если он не предоставлен и сохранен успешно', async () => {
             const inputWithoutImage = { color: 'blue' };
             const savedDataWithNullImage = {
                 ...mockSavedProductData,
@@ -78,7 +78,7 @@ describe('ProductService', () => {
             expect(result.color).toBe(inputWithoutImage.color);
         });
 
-        it('should throw 400 error if color is missing or empty', async () => {
+        it('должен отображать ошибку 400, если отсутствует цвет', async () => {
             const invalidDataMissingColor = { designImage: 'image.png' };
             await expect(productService.createProduct(invalidDataMissingColor, mockUserId))
                 .rejects.toMatchObject({
@@ -95,7 +95,7 @@ describe('ProductService', () => {
             expect(mockProductSaveFn).not.toHaveBeenCalled();
         });
 
-        it('should throw 400 error if userId is missing', async () => {
+        it('должен отображать ошибку 400, если отсутствует ID пользователя', async () => {
             await expect(productService.createProduct(mockProductInputData, null))
                 .rejects.toMatchObject({
                     message: 'Не предоставлен ID пользователя для создания продукта.',
@@ -104,7 +104,7 @@ describe('ProductService', () => {
             expect(mockProductSaveFn).not.toHaveBeenCalled();
         });
 
-        it('should throw 400 error with details if Mongoose validation fails on save', async () => {
+        it('должен отображать ошибку 400 при ошибке валидации Mongoose', async () => {
             const validationError = new Error('Validation failed');
             validationError.name = 'ValidationError';
             validationError.errors = { color: { message: 'Color is required by Mongoose due to schema' } };
@@ -119,7 +119,7 @@ describe('ProductService', () => {
                 });
         });
 
-        it('should throw 500 error if database save fails for other reasons', async () => {
+        it('должен отображать ошибку 500 при других ошибках сохранения в БД', async () => {
             const dbError = new Error('Generic DB Error on save');
             mockProductSaveFn.mockRejectedValueOnce(dbError);
 
@@ -141,14 +141,14 @@ describe('ProductService', () => {
             mockProductDataFromDb = { _id: mockExistingProductId, userId: 'user-abc-123', color: 'blue', designImage: 'image.jpg', createdAt: new Date() };
         });
 
-        it('should return a product if found by ID', async () => {
+        it('должен возвращать продукт, если он найден по ID', async () => {
             Product.findById.mockResolvedValue(mockProductDataFromDb);
             const result = await productService.getProductById(mockExistingProductId);
             expect(Product.findById).toHaveBeenCalledWith(mockExistingProductId);
             expect(result).toEqual(mockProductDataFromDb);
         });
 
-        it('should return null if product is not found by ID', async () => {
+        it('должен возвращать null, если продукт не найден по ID', async () => {
             const nonExistingId = new mongoose.Types.ObjectId().toString();
             Product.findById.mockResolvedValue(null);
             const result = await productService.getProductById(nonExistingId);
@@ -156,13 +156,13 @@ describe('ProductService', () => {
             expect(result).toBeNull();
         });
 
-        it('should return null if productId is not a valid ObjectId format', async () => {
+        it('должен возвращать null, если ID продукта имеет невалидный формат', async () => {
             const result = await productService.getProductById('invalid-id-format');
             expect(Product.findById).not.toHaveBeenCalled();
             expect(result).toBeNull();
         });
 
-        it('should throw 500 error if database query (findById) fails', async () => {
+        it('должен выбрасывать ошибку 500 при сбое запроса findById к БД', async () => {
             const dbError = new Error('Database findById connection error');
             Product.findById.mockRejectedValue(dbError);
 
@@ -176,7 +176,7 @@ describe('ProductService', () => {
     });
 
     describe('getAllProducts', () => {
-        it('should return an array of products sorted by createdAt descending', async () => {
+        it('должен возвращать массив продуктов, отсортированных по дате создания(убывание)', async () => {
             const mockProductsArray = [
                 { _id: 'prod1', color: 'red', createdAt: new Date('2023-01-02') },
                 { _id: 'prod2', color: 'blue', createdAt: new Date('2023-01-01') },
@@ -189,13 +189,13 @@ describe('ProductService', () => {
             expect(result).toEqual(mockProductsArray);
         });
 
-        it('should return an empty array if no products are found', async () => {
+        it('должен возвращать пустой массив, если продукты не найдены', async () => {
             Product.find.mockReturnValue({ sort: jest.fn().mockResolvedValue([]) });
             const result = await productService.getAllProducts();
             expect(result).toEqual([]);
         });
 
-        it('should throw 500 error if database query (find or sort) fails', async () => {
+        it('должен выбрасывать ошибку 500 при сбое запроса find/sort к БД', async () => {
             const dbError = new Error('DB error on find/sort in getAllProducts');
             Product.find.mockReturnValue({ sort: jest.fn().mockRejectedValue(dbError) });
 

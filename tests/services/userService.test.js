@@ -19,30 +19,30 @@ describe('UserService', () => {
     });
 
     describe('findUserByUsername', () => {
-        it('should return a user if found', async () => {
+        it('должен возвращать пользователя, если он найден по имени', async () => {
             User.findOne.mockResolvedValue(mockUserData);
             const user = await userService.findUserByUsername('testuser');
             expect(User.findOne).toHaveBeenCalledWith({ username: 'testuser' });
             expect(user).toEqual(mockUserData);
         });
 
-        it('should return null if user not found', async () => {
+        it('должен возвращать null, если пользователь не найден по имени', async () => {
             User.findOne.mockResolvedValue(null);
             const user = await userService.findUserByUsername('nonexistent');
             expect(User.findOne).toHaveBeenCalledWith({ username: 'nonexistent' });
             expect(user).toBeNull();
         });
 
-        it('should return null if username is empty or not a string', async () => {
+        it('должен возвращать null, если имя пользователя пустое или не строка', async () => {
             expect(await userService.findUserByUsername('')).toBeNull();
             expect(await userService.findUserByUsername(null)).toBeNull();
             expect(await userService.findUserByUsername(undefined)).toBeNull();
             expect(User.findOne).not.toHaveBeenCalled();
         });
 
-        it('should throw an error if database query fails', async () => {
+        it('должен отображать ошибку, если запрос к базе данных завершился неудачно', async () => {
             const dbError = new Error('DB findOne error');
-            User.findOne.mockRejectedValue(dbError);
+            User.findOne.mockRejectedValue(dbError); // Мокируем User.findOne для возврата ошибки
 
             await expect(userService.findUserByUsername('testuser'))
                 .rejects.toMatchObject({
@@ -60,42 +60,42 @@ describe('UserService', () => {
     });
 
     describe('findExistingUser', () => {
-        it('should return a user if found by username', async () => {
+        it('должен возвращать пользователя, если он найден по имени пользователя', async () => {
             User.findOne.mockResolvedValue(mockUserData);
             const user = await userService.findExistingUser('testuser', null);
             expect(User.findOne).toHaveBeenCalledWith({ $or: [{ username: 'testuser' }] });
             expect(user).toEqual(mockUserData);
         });
 
-        it('should return a user if found by email', async () => {
+        it('должен возвращать пользователя, если он найден по email', async () => {
             User.findOne.mockResolvedValue(mockUserData);
             const user = await userService.findExistingUser(null, 'test@example.com');
             expect(User.findOne).toHaveBeenCalledWith({ $or: [{ email: 'test@example.com' }] });
             expect(user).toEqual(mockUserData);
         });
 
-        it('should return a user if found by username or email', async () => {
+        it('должен возвращать пользователя, если он найден по имени пользователя или email', async () => {
             User.findOne.mockResolvedValue(mockUserData);
             const user = await userService.findExistingUser('testuser', 'test@example.com');
             expect(User.findOne).toHaveBeenCalledWith({ $or: [{ username: 'testuser' }, { email: 'test@example.com' }] });
             expect(user).toEqual(mockUserData);
         });
 
-        it('should return null if user not found', async () => {
+        it('должен возвращать null, если пользователь не найден', async () => {
             User.findOne.mockResolvedValue(null);
             const user = await userService.findExistingUser('nonexistent', 'no@example.com');
             expect(User.findOne).toHaveBeenCalledWith({ $or: [{ username: 'nonexistent' }, { email: 'no@example.com' }] });
             expect(user).toBeNull();
         });
 
-        it('should return null if both username and email are invalid/empty', async () => {
+        it('должен возвращать null, если имя пользователя и email неверны/пусты', async () => {
             expect(await userService.findExistingUser('', null)).toBeNull();
             expect(await userService.findExistingUser(null, '')).toBeNull();
             expect(await userService.findExistingUser(undefined, undefined)).toBeNull();
             expect(User.findOne).not.toHaveBeenCalled();
         });
 
-        it('should throw an error if database query fails', async () => {
+        it('должен отображать ошибку при сбое запроса к БД', async () => {
             const dbError = new Error('DB findOne $or error');
             User.findOne.mockRejectedValue(dbError);
             await expect(userService.findExistingUser('testuser', 'test@example.com'))
@@ -131,7 +131,7 @@ describe('UserService', () => {
             }));
         });
 
-        it('should create and save a new user successfully', async () => {
+        it('должен успешно создавать и сохранять нового пользователя', async () => {
             const user = await userService.createUser(mockUserInput);
             expect(hashPassword).toHaveBeenCalledWith(mockUserInput.password);
             expect(User).toHaveBeenCalledTimes(1);
@@ -144,7 +144,7 @@ describe('UserService', () => {
             expect(user).toEqual(mockSavedUserData);
         });
 
-        it('should throw 400 if required fields are missing (e.g., password)', async () => {
+        it('должен отображать ошибку 400, если отсутствуют обязательные поля', async () => {
             await expect(userService.createUser({ username: 'u', email: 'e@e.com', password: '' }))
                 .rejects.toMatchObject({
                     message: 'Имя пользователя, email и пароль обязательны.',
@@ -153,7 +153,7 @@ describe('UserService', () => {
             expect(mockUserSaveFn).not.toHaveBeenCalled();
         });
 
-        it('should throw 409 if user with username already exists (duplicate key error from DB)', async () => {
+        it('должен отображать ошибку 409, если пользователь с таким именем уже существует', async () => {
             const duplicateError = new Error('E11000 duplicate key error collection: test.users index: username_1 dup key: { username: "newuser" }');
             duplicateError.code = 11000;
             mockUserSaveFn.mockRejectedValueOnce(duplicateError);
@@ -166,7 +166,7 @@ describe('UserService', () => {
                 });
         });
 
-        it('should throw 409 if user with email already exists (duplicate key error from DB)', async () => {
+        it('должен отображать ошибку 409, если пользователь с таким email уже существует', async () => {
             const duplicateError = new Error('E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "new@example.com" }');
             duplicateError.code = 11000;
             mockUserSaveFn.mockRejectedValueOnce(duplicateError);
@@ -179,7 +179,7 @@ describe('UserService', () => {
                 });
         });
 
-        it('should throw 400 if Mongoose validation fails', async () => {
+        it('должен отображать ошибку 400 при ошибке валидации Mongoose', async () => {
             const validationError = new Error('User validation failed: email: Path `email` is invalid.');
             validationError.name = 'ValidationError';
             validationError.errors = { email: { message: 'Path `email` is invalid.' } };
@@ -194,7 +194,7 @@ describe('UserService', () => {
                 });
         });
 
-        it('should throw 500 for other database errors during save', async () => {
+        it('должен отображать ошибку 500 при других ошибках сохранения в БД', async () => {
             const dbError = new Error('Some other DB error during save');
             mockUserSaveFn.mockRejectedValueOnce(dbError);
 

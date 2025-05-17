@@ -43,7 +43,7 @@ jobs:
           MONGODB_URI: mongodb://localhost:27017/povod_test
           PORT: 3001
           SESSION_SECRET: 'a_very_strong_ci_secret_key_for_functional_tests'
-          # CYPRESS_BASE_URL: http://localhost:3001 
+          
 
       - name: Store Cypress artifacts on failure
         if: failure() # Запускать только если предыдущие шаги упали
@@ -155,10 +155,10 @@ jobs:
         shell: bash
 
       - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.10.0
+        uses: zaproxy/action-baseline@v0
         with:
           target: 'http://localhost:3002'
-          cmd_options: '-a -j' # -a включает альфа-правила, -j генерирует JSON отчет
+          cmd_options: '-a -j' 
 
       - name: Upload ZAP Baseline Scan Report
         uses: actions/upload-artifact@v4

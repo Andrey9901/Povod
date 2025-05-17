@@ -114,7 +114,7 @@ describe('UI Тесты - Аутентификация пользователя 
         });
 
         it('должен показывать ошибку сервера при попытке регистрации с существующим email', () => {
-            const existingEmailData = generateUserData('exEmail'); // Короткий префикс
+            const existingEmailData = generateUserData('exEmail'); 
             cy.request({
                 method: 'POST',
                 url: '/auth/register',
@@ -124,7 +124,7 @@ describe('UI Тесты - Аутентификация пользователя 
             RegistrationPage.visit();
             RegistrationPage.usernameInput.closest('form').invoke('attr', 'novalidate', 'novalidate');
 
-            RegistrationPage.fillUsername(`another_${runTimestamp}`); // Валидное имя
+            RegistrationPage.fillUsername(`another_${runTimestamp}`); 
             RegistrationPage.fillEmail(existingEmailData.email);
             RegistrationPage.fillPassword(existingEmailData.password);
             RegistrationPage.fillConfirmPassword(existingEmailData.password);
