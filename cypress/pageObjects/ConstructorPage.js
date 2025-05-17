@@ -41,7 +41,7 @@ class ConstructorPage {
     // --- Методы для взаимодействия ---
     visit() {
         cy.visit('/constructor');
-        this.pageTitle.should('be.visible').and('contain', 'Конструктор одежды');
+        cy.get('.preview-container h2').should('be.visible').and('contain', 'Предпросмотр:');
         return this;
     }
 
