@@ -17,8 +17,10 @@ const shirtImages = {
 // Обработчик изменения цвета
 colorSelect.addEventListener('change', function () {
     const selectedColor = this.value; // Получаем выбранный цвет
+    // eslint-disable-next-line security/detect-object-injection
     if (shirtImages[selectedColor]) {
         // Если для выбранного цвета есть изображение, обновляем src
+        // eslint-disable-next-line security/detect-object-injection
         clothingImage.src = shirtImages[selectedColor];
     } else {
         console.error('Изображение для выбранного цвета не найдено.');

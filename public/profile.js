@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Отображение созданных продуктов ("заказов")
             // Используем поле createdProducts, как возвращает обновленный API
-             if (data.createdProducts && Array.isArray(data.createdProducts)) {
-            ordersCountElement.textContent = data.createdProducts.length;
-            if (data.createdProducts.length > 0) {
+            if (data.createdProducts && Array.isArray(data.createdProducts)) {
+                ordersCountElement.textContent = data.createdProducts.length;
+                if (data.createdProducts.length > 0) {
                 // Генерируем HTML для списка продуктов с изображениями
-                ordersListElement.innerHTML = '<ul>' +
+                    ordersListElement.innerHTML = '<ul>' +
                     data.createdProducts.map(product => {
                         // Проверяем, есть ли поле designImage
                         const designImage = product.designImage ? `/uploads/${product.designImage}` : '/default-image.png'; // Замените на путь к дефолтному изображению
@@ -74,14 +74,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </li>`;
                     }).join('') +
                     '</ul>';
+                } else {
+                    ordersListElement.innerHTML = '<p>Вы еще не создали ни одного продукта.</p>';
+                }
             } else {
-                ordersListElement.innerHTML = '<p>Вы еще не создали ни одного продукта.</p>';
+                console.error('Profile.js: createdProducts data not found or not an array.');
+                ordersListElement.innerHTML = '<p>Не удалось загрузить данные о продуктах.</p>';
+                ordersCountElement.textContent = '0';
             }
-        } else {
-            console.error('Profile.js: createdProducts data not found or not an array.');
-            ordersListElement.innerHTML = '<p>Не удалось загрузить данные о продуктах.</p>';
-            ordersCountElement.textContent = '0';
-        }
         
         } catch (error) { // Ловит сетевые ошибки (Failed to fetch) и ошибки из throw new Error
             console.error('Profile.js: Failed to fetch or process profile data:', error);
