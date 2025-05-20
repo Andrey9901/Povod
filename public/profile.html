@@ -15,6 +15,10 @@
                 <!-- Ссылка на главную -->
                 <img src="/logo.jpg" alt="Логотип" class="logo">
             </a>
+            <!-- Кнопка меню для мобильных устройств -->
+        <button class="menu-toggle" aria-label="Открыть меню">
+            <i class="fas fa-bars"></i>
+        </button>
             <nav class="menu">
                 <ul>
                     <li><a href="/">Главная</a></li>
@@ -87,6 +91,7 @@
 
     <!-- Подключение JavaScript для загрузки данных профиля -->
     <script src="/profile.js"></script>
+    <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const logoutLink = document.getElementById('logout-link');

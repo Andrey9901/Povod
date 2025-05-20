@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина - Povod</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="containerMenu">
+            <a href="/index.html">
+                <img src="logo.jpg" alt="Логотип" class="logo">
+            </a>
+            <!-- Кнопка меню для мобильных устройств -->
+        <button class="menu-toggle" aria-label="Открыть меню">
+            <i class="fas fa-bars"></i>
+        </button>
+            <nav class="menu">
+                <ul>
+                    <li><a href="/index.html">Главная</a></li>
+                    <li><a href="/catalog">Каталог</a></li>
+                    <li><a href="/constructor">Конструктор</a></li>
+                    <li><a href="/about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="#" class="action-icon"><i class="fas fa-search"></i></a>
+                <a href="/login" class="action-icon"><i class="fas fa-user"></i></a>
+                <a href="/basket" class="action-icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">3</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <section class="basket-content">
+        <div class="container">
+            <div class="basket-items">
+                <!-- Пример товара в корзине -->
+                <div class="basket-item">
+                    <div class="item-image">
+                        <img src="tovar.jpg" alt="Товар 1">
+                    </div>
+                    <div class="item-details">
+                        <h3>Вышивка на футболке</h3>
+                        <p class="price">2500 ₽</p>
+                        <button class="remove-item-button">Удалить</button>
+                    </div>
+                </div>
+                <div class="basket-item">
+                    <div class="item-image">
+                        <img src="tovar2.jpg" alt="Товар 2">
+                    </div>
+                    <div class="item-details">
+                        <h3>Вышивка на худи</h3>
+                        <p class="price">2500 ₽</p>
+                        <button class="remove-item-button">Удалить</button>
+                    </div>
+                </div>
+                <div class="basket-item">
+                    <div class="item-image">
+                        <img src="tovar3.jpg" alt="Товар 3">
+                    </div>
+                    <div class="item-details">
+                        <h3>Вышивка на свитшоте</h3>
+                        <p class="price">2500 ₽</p>
+                        <button class="remove-item-button">Удалить</button>
+                    </div>
+                </div>
+            </div>
+            <div class="basket-summary">
+                <h2>Итого:</h2>
+                <p class="total-price">7500 ₽</p>
+                <button class="checkout-button">Оформить заказ</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Povod. Все права защищены.</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

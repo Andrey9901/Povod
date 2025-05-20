@@ -32,7 +32,7 @@ body {
     background-color: #fff;
     padding: 10px 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -41,17 +41,58 @@ body {
     height: auto;
 }
 
+.menu {
+    display: flex;
+}
+
 .menu ul {
     list-style: none;
     display: flex;
     gap: 20px;
-    justify-content: center;
 }
 
 .menu ul li a {
     text-decoration: none;
     color: #333;
     font-weight: bold;
+}
+
+.menu-toggle {
+    display: none; /* Скрываем кнопку меню по умолчанию */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.header-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .menu {
+        display: none; /* Скрываем меню на мобильных устройствах */
+        flex-direction: column;
+        gap: 10px;
+        position: absolute;
+        top: 60px; /* Высота шапки */
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    .menu.active {
+        display: flex; /* Показываем меню при активации */
+    }
+
+    .menu-toggle {
+        display: block; /* Показываем кнопку меню на мобильных устройствах */
+    }
 }
 
 .menu ul li a:hover {
@@ -104,6 +145,31 @@ body {
     font-size: 0.8rem;
     padding: 2px 6px;
     border-radius: 50%;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100%;
+    }
+
+    .image-container img {
+        width: 100%;
+        height: auto;
+    }
+
+    .products {
+        display: flex;
+        flex-direction: column;
+    }
+    .product {
+        width: 100%;
+    }
 }
 
 /* Стили для формы поиска */
@@ -268,6 +334,13 @@ body {
     border-radius: 8px;
     overflow: hidden;
 
+}
+/* Адаптивность */
+@media (max-width: 768px) {
+    .product {
+        width: 100%;
+        max-width: 300px;
+    }
 }
 
 .product img {
@@ -728,4 +801,118 @@ body {
     text-align: center;
     color: #666;
     font-size: 16px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .upload-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Корзина */
+.basket-content {
+    padding: 40px 0;
+}
+
+.basket-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.basket-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.item-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-details {
+    flex: 1;
+    text-align: left;
+}
+
+.item-details h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.item-details .price {
+    font-size: 1rem;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.remove-item-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.remove-item-button:hover {
+    background-color: #e60000;
+}
+
+.basket-summary {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.basket-summary h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.basket-summary .total-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.checkout-button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+    background-color: #0056b3;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .basket-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-image img {
+        width: 100%;
+        height: auto;
+    }
 }

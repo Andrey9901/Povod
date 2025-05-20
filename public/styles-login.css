@@ -9,6 +9,37 @@ body {
     align-items: center;
     height: 100vh;
 }
+
+/* Общие стили для форм */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group input {
+    width: 100%; /* Полная ширина родительского контейнера */
+    padding: 10px; /* Отступы внутри полей ввода */
+    border: 1px solid #ccc; /* Граница */
+    border-radius: 4px; /* Скругленные углы */
+    font-size: 16px; /* Размер шрифта */
+    box-sizing: border-box; /* Учитываем padding и border в ширине */
+}
+
+.auth-button {
+    width: 100%; /* Кнопка занимает всю ширину контейнера */
+    padding: 10px; /* Отступы внутри кнопки */
+    background-color: #007bff; /* Цвет фона */
+    color: white; /* Цвет текста */
+    border: none; /* Без границы */
+    border-radius: 4px; /* Скругленные углы */
+    font-size: 16px; /* Размер шрифта */
+    cursor: pointer; /* Курсор указывает, что кнопку можно нажать */
+    transition: background-color 0.3s ease; /* Плавный переход цвета */
+}
+
+.auth-button:hover {
+    background-color: #0056b3; /* Цвет при наведении */
+}
 .auth-container {
     background-color: #fff;
     padding: 20px 40px;
@@ -43,7 +74,7 @@ body {
 .auth-button {
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
+    background-color: #000000;
     color: #fff;
     border: none;
     border-radius: 4px;
