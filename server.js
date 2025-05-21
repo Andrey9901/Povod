@@ -84,6 +84,9 @@ app.get('/about', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'ab
 app.get('/profile', ensureAuthenticated, (req, res) => { // req используется в ensureAuthenticated
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
+app.get('/basket', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'basket.html'));
+});
 
 // --- ДРУГИЕ API ЭНДПОИНТЫ ---
 app.get('/api/profile', ensureAuthenticated, async (req, res) => {

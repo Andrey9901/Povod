@@ -473,10 +473,51 @@ body {
     opacity: 1;
 }
 
+/* Стили для выбора размера */
+.size-selector {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.size-selector label {
+    display: block;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.size-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+    appearance: none; /* Убираем стандартный вид стрелки */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="16" height="16"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+.size-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
 @media (max-width: 768px) {
     .product {
-        width: 100%;
-        max-width: 300px;
+        width: calc(50% - 20px); /* Для двух колонок */
+    }
+
+    .product img {
+        max-width: 100%; /* Убедитесь, что изображения не выходят за границы */
+        height: auto;
     }
 }
 
@@ -722,15 +763,21 @@ body {
 }
 
 .profile-sections {
+    margin-top: 40px;
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Две колонки */
     gap: 20px; /* Поля между ячейками */
-    margin-top: 40px;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
+}
+
+@media (max-width: 768px) {
+    .profile-sections {
+        display: block;
+    }
 }
 
 .profile-section {
@@ -907,12 +954,74 @@ body {
 /* Адаптивность */
 @media (max-width: 768px) {
     .basket-item {
-        flex-direction: column;
         align-items: flex-start;
     }
 
     .item-image img {
         width: 100%;
-        height: auto;
     }
+
+    .item-details {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
+
+/* Стили для выбора размера */
+.size-selector {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.size-selector label {
+    display: block;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.size-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+    appearance: none; /* Убираем стандартный вид стрелки */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="16" height="16"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+.size-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Стили для выбора количества */
+.quantity-selector {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.quantity-selector label {
+    display: block;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.quantity-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
 }
